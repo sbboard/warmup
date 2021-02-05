@@ -36,4 +36,12 @@ input {
   -webkit-appearance: none;
   border-radius: 0; }
 
+#thumbnails {
+  width: 100%;
+  display: block;
+  height: 200px; }
+  #thumbnails img {
+    max-height: 100%;
+    width: auto; }
+
 /*# sourceMappingURL=style.css.map */

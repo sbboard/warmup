@@ -1,10 +1,45 @@
-let imgNum: number = 1;
+let imgNum: number = 0;
+let uploadedImages: any[];
+let timeCalc: number = 0;
+let fileTag = <HTMLInputElement>document.getElementById("filetag");
+let minPerImg = <HTMLInputElement>document.getElementById("minPerImg");
 
 function changeMinPerImg(input: HTMLInputElement) {
   if (input.value.length > 0) {
-    let timeCalc = imgNum * parseInt(input.value);
+    timeCalc = imgNum * parseInt(input.value);
     document.getElementById("totalTime").innerHTML = timeCalc.toString();
   } else {
     document.getElementById("totalTime").innerHTML = "0";
+  }
+}
+
+function changeImage(input: HTMLInputElement) {
+  if (input.files) {
+    document.getElementById("thumbnails").innerHTML = "";
+    imgNum = input.files.length;
+    //go through images
+    for (let i = 0; i < input.files.length; i++) {
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        var newImg = document.createElement("img") as HTMLImageElement;
+        newImg.src = e.target.result as string;
+        document.getElementById("thumbnails").appendChild(newImg);
+      };
+      reader.readAsDataURL(input.files[i]);
+    }
+    document.getElementById("queueNum").innerHTML = imgNum.toString();
+    changeMinPerImg(minPerImg);
+  }
+}
+
+function startApp() {
+  if (timeCalc > 0) {
+    console.log("YES");
+  } else {
+    if (imgNum < 1) {
+      alert("Upload Images First");
+    } else {
+      alert("Timer set to 0");
+    }
   }
 }
