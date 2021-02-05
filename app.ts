@@ -5,15 +5,26 @@ let timeCalc: number = 0;
 let fileTag = <HTMLInputElement>document.getElementById("filetag");
 let minPerImg = <HTMLInputElement>document.getElementById("minPerImg");
 let currentImg: number = -1;
+let nextSFX = document.getElementById("nextSFX") as HTMLAudioElement;
+const musicVolume = 0.2;
+nextSFX.volume = musicVolume;
 
 /////////////
 //////START UP
 ////////////
 function changeMinPerImg(input: HTMLInputElement) {
   if (input.value.length > 0) {
-    minutes = parseInt(input.value);
-    timeCalc = imgNum * parseInt(input.value);
-    document.getElementById("totalTime").innerHTML = timeCalc.toString();
+    if (parseInt(input.value) < 1){
+        input.value = "1"
+    }
+    else if(parseInt(input.value) > 25){
+        input.value = "25"
+    }
+    else{
+      minutes = parseInt(input.value);
+      timeCalc = imgNum * parseInt(input.value);
+      document.getElementById("totalTime").innerHTML = timeCalc.toString();
+    }
   } else {
     document.getElementById("totalTime").innerHTML = "0";
   }
@@ -54,7 +65,10 @@ function startApp() {
 
     //create timer element
     let timer = document.createElement("span") as HTMLDivElement;
-    timer.innerHTML = `${minutes.toString()}:00`;
+    timer.innerHTML = new Date(minutes * 60 * 1000)
+      .toISOString()
+      .substr(14, 5)
+      .toString();
     timer.id = "timer";
     document.getElementById("app").appendChild(timer);
 
@@ -79,17 +93,26 @@ function startTimer() {
 
   function downTick() {
     secondsDummy = secondsDummy - 1;
-    timer.innerHTML = secondsDummy.toString();
+    timer.innerHTML = new Date(secondsDummy * 1000)
+      .toISOString()
+      .substr(14, 5)
+      .toString();
   }
 
   let timeBomb = setInterval(downTick, 1000);
   setTimeout(function () {
     clearInterval(timeBomb);
     if (currentImg + 1 != uploadedImages.length) {
-      timer.innerHTML = `${minutes.toString()}:00`;
+      timer.innerHTML = new Date(minutes * 60 * 1000)
+        .toISOString()
+        .substr(14, 5)
+        .toString();
       nextImg();
     } else {
-      console.log("that's all of them");
+      document.getElementById("app").innerHTML = "GOOD WARM-UP!";
+      let endMusic = document.getElementById("endMusic") as HTMLAudioElement;
+      endMusic.volume = musicVolume;
+      endMusic.play();
     }
   }, minutes * 60 * 1000);
 }
@@ -98,5 +121,6 @@ function nextImg() {
   currentImg++;
   let gallery = document.getElementById("galleryImg") as HTMLImageElement;
   gallery.src = uploadedImages[currentImg];
+  nextSFX.play();
   startTimer();
 }
