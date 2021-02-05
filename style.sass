@@ -45,7 +45,37 @@ input
         width: auto
 
 #galleryImg
-    height: 400px
-    width: auto
+    object-fit: contain
+    width: 100vw
+    height: 100vh
 #timer
     display: block
+    position: absolute
+    z-index: 255
+    padding: 1em
+    color: white
+    background-color: black
+    bottom: 0
+    right: 0
+    border-top-left-radius: .5em
+    border-top: solid 1px white
+    border-left: solid 1px white
+#app
+    height: 100vh
+    background-color: #1d1d1d
+    color: white
+#endScreen
+    display: flex
+    text-align: center
+    width: 100vw
+    height: 100vh
+    justify-content: center
+    align-items: center
+#startScreen
+    width: 200px
+    padding-top: 1em
+    margin: 0 auto 0 auto
+    display: block
+    button
+        width: 100%
+        margin-top: 1em

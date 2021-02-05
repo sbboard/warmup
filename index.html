@@ -8,26 +8,28 @@
   </head>
   <body>
     <div id="app">
-      <input
-        type="file"
-        multiple
-        id="filetag"
-        onchange="changeImage(this)"
-        accept="image/x-png,image/gif,image/jpeg"
-      />
-      <div id="thumbnails"></div>
-      images in queue: <span id="queueNum">0</span><br />
-      <label for="minPerImg">minutes per image: </label
-      ><input
-        id="minPerImg"
-        onkeyup="changeMinPerImg(this)"
-        type="number"
-        value="10"
-        max="25"
-        min="1"
-      /><br />
-      total warm-up time: <span id="totalTime">0</span><br />
-      <button onclick="startApp()">Go</button>
+      <div id="startScreen">
+        <input
+          type="file"
+          multiple
+          id="filetag"
+          onchange="changeImage(this)"
+          accept="image/x-png,image/gif,image/jpeg"
+        />
+        <div id="thumbnails"></div>
+        images in queue: <span id="queueNum">0</span><br />
+        <label for="minPerImg">minutes per image: </label
+        ><input
+          id="minPerImg"
+          onkeyup="changeMinPerImg(this)"
+          type="number"
+          value="10"
+          max="25"
+          min="1"
+        /><br />
+        total warm-up time: <span id="totalTime">0</span> minutes<br />
+        <button onclick="startApp()">Go</button>
+      </div>
     </div>
     <audio id="endMusic" src="/sfx/end.mp3"></audio>
     <audio id="nextSFX" src="/sfx/next.wav"></audio>

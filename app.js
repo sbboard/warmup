@@ -102,7 +102,11 @@ function startTimer() {
             nextImg();
         }
         else {
-            document.getElementById("app").innerHTML = "GOOD WARM-UP!";
+            var endScreen = document.createElement("div");
+            endScreen.id = "endScreen";
+            endScreen.innerHTML = "GOOD WARM-UP!";
+            document.getElementById("app").innerHTML = "";
+            document.getElementById("app").appendChild(endScreen);
             var endMusic = document.getElementById("endMusic");
             endMusic.volume = musicVolume;
             endMusic.play();

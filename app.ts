@@ -109,7 +109,11 @@ function startTimer() {
         .toString();
       nextImg();
     } else {
-      document.getElementById("app").innerHTML = "GOOD WARM-UP!";
+    let endScreen = document.createElement("div")
+    endScreen.id = "endScreen"
+      endScreen.innerHTML = "GOOD WARM-UP!";
+      document.getElementById("app").innerHTML = ""
+      document.getElementById("app").appendChild(endScreen)
       let endMusic = document.getElementById("endMusic") as HTMLAudioElement;
       endMusic.volume = musicVolume;
       endMusic.play();
