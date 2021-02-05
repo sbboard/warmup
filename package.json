@@ -1,0 +1,23 @@
+{
+  "name": "warmup",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000w\u0000a\u0000r\u0000m\u0000u\u0000p\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sbboard/warmup.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sbboard/warmup/issues"
+  },
+  "homepage": "https://github.com/sbboard/warmup#readme",
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
