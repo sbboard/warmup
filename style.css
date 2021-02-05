@@ -44,4 +44,8 @@ input {
     max-height: 100%;
     width: auto; }
 
+#galleryImg {
+  height: 400px;
+  width: auto; }
+
 /*# sourceMappingURL=style.css.map */
