@@ -14,13 +14,11 @@ nextSFX.volume = musicVolume;
 ////////////
 function changeMinPerImg(input: HTMLInputElement) {
   if (input.value.length > 0) {
-    if (parseInt(input.value) < 1){
-        input.value = "1"
-    }
-    else if(parseInt(input.value) > 25){
-        input.value = "25"
-    }
-    else{
+    if (parseInt(input.value) < 1) {
+      input.value = "1";
+    } else if (parseInt(input.value) > 25) {
+      input.value = "25";
+    } else {
       minutes = parseInt(input.value);
       timeCalc = imgNum * parseInt(input.value);
       document.getElementById("totalTime").innerHTML = timeCalc.toString();
@@ -72,6 +70,12 @@ function startApp() {
     timer.id = "timer";
     document.getElementById("app").appendChild(timer);
 
+    //create count element
+    let count = document.createElement("span") as HTMLDivElement;
+    count.innerHTML = `${currentImg + 1}/${uploadedImages.length}`;
+    count.id = "theCount";
+    document.getElementById("app").appendChild(count);
+
     nextImg();
   } else {
     if (imgNum < 1) {
@@ -109,11 +113,11 @@ function startTimer() {
         .toString();
       nextImg();
     } else {
-    let endScreen = document.createElement("div")
-    endScreen.id = "endScreen"
+      let endScreen = document.createElement("div");
+      endScreen.id = "endScreen";
       endScreen.innerHTML = "GOOD WARM-UP!";
-      document.getElementById("app").innerHTML = ""
-      document.getElementById("app").appendChild(endScreen)
+      document.getElementById("app").innerHTML = "";
+      document.getElementById("app").appendChild(endScreen);
       let endMusic = document.getElementById("endMusic") as HTMLAudioElement;
       endMusic.volume = musicVolume;
       endMusic.play();
@@ -123,6 +127,10 @@ function startTimer() {
 
 function nextImg() {
   currentImg++;
+
+  let count = document.getElementById("theCount") as HTMLSpanElement;
+  count.innerHTML = `${currentImg + 1}/${uploadedImages.length}`;
+
   let gallery = document.getElementById("galleryImg") as HTMLImageElement;
   gallery.src = uploadedImages[currentImg];
   nextSFX.play();

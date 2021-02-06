@@ -8,9 +8,6 @@ var currentImg = -1;
 var nextSFX = document.getElementById("nextSFX");
 var musicVolume = 0.2;
 nextSFX.volume = musicVolume;
-/////////////
-//////START UP
-////////////
 function changeMinPerImg(input) {
     if (input.value.length > 0) {
         if (parseInt(input.value) < 1) {
@@ -31,11 +28,9 @@ function changeMinPerImg(input) {
 }
 function changeImage(input) {
     if (input.files) {
-        //clear images
         document.getElementById("thumbnails").innerHTML = "";
         uploadedImages = [];
         imgNum = input.files.length;
-        //go through images
         for (var i = 0; i < input.files.length; i++) {
             var reader = new FileReader();
             reader.onload = function (e) {
@@ -52,13 +47,10 @@ function changeImage(input) {
 }
 function startApp() {
     if (timeCalc > 0) {
-        //clear app
         document.getElementById("app").innerHTML = "";
-        //create image element
         var bigImg = document.createElement("img");
         bigImg.id = "galleryImg";
         document.getElementById("app").appendChild(bigImg);
-        //create timer element
         var timer = document.createElement("span");
         timer.innerHTML = new Date(minutes * 60 * 1000)
             .toISOString()
@@ -66,6 +58,10 @@ function startApp() {
             .toString();
         timer.id = "timer";
         document.getElementById("app").appendChild(timer);
+        var count = document.createElement("span");
+        count.innerHTML = currentImg + 1 + "/" + uploadedImages.length;
+        count.id = "theCount";
+        document.getElementById("app").appendChild(count);
         nextImg();
     }
     else {
@@ -77,9 +73,6 @@ function startApp() {
         }
     }
 }
-////////////////////
-////RUNNING
-///////////////////
 function startTimer() {
     var timer = document.getElementById("timer");
     var seconds = minutes * 60;
@@ -115,6 +108,8 @@ function startTimer() {
 }
 function nextImg() {
     currentImg++;
+    var count = document.getElementById("theCount");
+    count.innerHTML = currentImg + 1 + "/" + uploadedImages.length;
     var gallery = document.getElementById("galleryImg");
     gallery.src = uploadedImages[currentImg];
     nextSFX.play();

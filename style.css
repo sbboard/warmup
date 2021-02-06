@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 *, *:before, *:after {
   box-sizing: border-box; }
 
@@ -39,10 +40,12 @@ input {
 #thumbnails {
   width: 100%;
   display: block;
-  height: 200px; }
+  height: 200px;
+  padding: 1em 0; }
   #thumbnails img {
     max-height: 100%;
-    width: auto; }
+    width: auto;
+    margin-right: 0.5em; }
 
 #galleryImg {
   object-fit: contain;
@@ -55,16 +58,12 @@ input {
   z-index: 255;
   padding: 1em;
   color: white;
-  background-color: black;
-  bottom: 0;
-  right: 0;
-  border-top-left-radius: 0.5em;
-  border-top: solid 1px white;
-  border-left: solid 1px white; }
+  top: 0;
+  right: 0; }
 
 #app {
   height: 100vh;
-  background-color: #1d1d1d;
+  background-color: #131313;
   color: white; }
 
 #endScreen {
@@ -76,12 +75,24 @@ input {
   align-items: center; }
 
 #startScreen {
-  width: 200px;
+  padding-left: 1em;
   padding-top: 1em;
   margin: 0 auto 0 auto;
-  display: block; }
+  display: block;
+  line-height: 1.6; }
   #startScreen button {
-    width: 100%;
+    width: 200px;
     margin-top: 1em; }
+
+body {
+  line-height: 0;
+  font-family: "Roboto", sans-serif; }
+
+#theCount {
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: 5;
+  padding: 1em; }
 
 /*# sourceMappingURL=style.css.map */

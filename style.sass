@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap')
+    
 *, *:before, *:after
     box-sizing: border-box
 
@@ -40,9 +42,11 @@ input
     width: 100%
     display: block
     height: 200px
+    padding: 1em 0
     img
         max-height: 100%
         width: auto
+        margin-right: .5em
 
 #galleryImg
     object-fit: contain
@@ -54,15 +58,11 @@ input
     z-index: 255
     padding: 1em
     color: white
-    background-color: black
-    bottom: 0
+    top: 0
     right: 0
-    border-top-left-radius: .5em
-    border-top: solid 1px white
-    border-left: solid 1px white
 #app
     height: 100vh
-    background-color: #1d1d1d
+    background-color: #131313
     color: white
 #endScreen
     display: flex
@@ -72,10 +72,21 @@ input
     justify-content: center
     align-items: center
 #startScreen
-    width: 200px
+    padding-left: 1em
     padding-top: 1em
     margin: 0 auto 0 auto
     display: block
+    line-height: 1.6
     button
-        width: 100%
+        width: 200px
         margin-top: 1em
+body
+    line-height: 0
+    font-family: 'Roboto', sans-serif
+
+#theCount
+    bottom: 0
+    right: 0
+    position: absolute
+    z-index: 5
+    padding: 1em
