@@ -40,10 +40,9 @@ input {
 #thumbnails {
   width: 100%;
   display: block;
-  height: 200px;
   padding: 1em 0; }
   #thumbnails img {
-    max-height: 100%;
+    max-height: 200px;
     width: auto;
     margin-right: 0.5em; }
 
@@ -72,7 +71,8 @@ input {
   width: 100vw;
   height: 100vh;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  animation: fadeup 1s; }
 
 #startScreen {
   padding-left: 1em;
@@ -94,5 +94,13 @@ body {
   position: absolute;
   z-index: 5;
   padding: 1em; }
+
+@keyframes fadeup {
+  from {
+    padding-top: 3em;
+    opacity: 0; }
+  to {
+    padding-top: 0;
+    opacity: 1; } }
 
 /*# sourceMappingURL=style.css.map */

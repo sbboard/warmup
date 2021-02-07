@@ -101,6 +101,18 @@ function startTimer() {
       .toISOString()
       .substr(14, 5)
       .toString();
+
+    console.log(secondsDummy);
+    if (secondsDummy == 60) {
+      let minuteWarning = document.getElementById("oneMin") as HTMLAudioElement;
+      minuteWarning.volume = musicVolume;
+      minuteWarning.play();
+    } else if (secondsDummy <= 3 && secondsDummy != 0) {
+      console.log("trig");
+      let tok = document.getElementById("tok") as HTMLAudioElement;
+      tok.volume = musicVolume;
+      tok.play();
+    }
   }
 
   let timeBomb = setInterval(downTick, 1000);

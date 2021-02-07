@@ -41,10 +41,9 @@ input
 #thumbnails
     width: 100%
     display: block
-    height: 200px
     padding: 1em 0
     img
-        max-height: 100%
+        max-height: 200px
         width: auto
         margin-right: .5em
 
@@ -71,6 +70,7 @@ input
     height: 100vh
     justify-content: center
     align-items: center
+    animation: fadeup 1s
 #startScreen
     padding-left: 1em
     padding-top: 1em
@@ -90,3 +90,10 @@ body
     position: absolute
     z-index: 5
     padding: 1em
+@keyframes fadeup
+    from
+        padding-top: 3em
+        opacity: 0
+    to
+        padding-top: 0
+        opacity: 1

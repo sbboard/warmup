@@ -83,6 +83,18 @@ function startTimer() {
             .toISOString()
             .substr(14, 5)
             .toString();
+        console.log(secondsDummy);
+        if (secondsDummy == 60) {
+            var minuteWarning = document.getElementById("oneMin");
+            minuteWarning.volume = musicVolume;
+            minuteWarning.play();
+        }
+        else if (secondsDummy <= 3 && secondsDummy != 0) {
+            console.log("trig");
+            var tok = document.getElementById("tok");
+            tok.volume = musicVolume;
+            tok.play();
+        }
     }
     var timeBomb = setInterval(downTick, 1000);
     setTimeout(function () {
