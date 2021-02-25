@@ -8,6 +8,9 @@ var currentImg = -1;
 var nextSFX = document.getElementById("nextSFX");
 var musicVolume = 0.2;
 nextSFX.volume = musicVolume;
+/////////////
+//////START UP
+////////////
 function changeMinPerImg(input) {
     if (input.value.length > 0) {
         if (parseInt(input.value) < 1) {
@@ -28,9 +31,11 @@ function changeMinPerImg(input) {
 }
 function changeImage(input) {
     if (input.files) {
+        //clear images
         document.getElementById("thumbnails").innerHTML = "";
         uploadedImages = [];
         imgNum = input.files.length;
+        //go through images
         for (var i = 0; i < input.files.length; i++) {
             var reader = new FileReader();
             reader.onload = function (e) {
@@ -47,10 +52,13 @@ function changeImage(input) {
 }
 function startApp() {
     if (timeCalc > 0) {
+        //clear app
         document.getElementById("app").innerHTML = "";
+        //create image element
         var bigImg = document.createElement("img");
         bigImg.id = "galleryImg";
         document.getElementById("app").appendChild(bigImg);
+        //create timer element
         var timer = document.createElement("span");
         timer.innerHTML = new Date(minutes * 60 * 1000)
             .toISOString()
@@ -58,10 +66,17 @@ function startApp() {
             .toString();
         timer.id = "timer";
         document.getElementById("app").appendChild(timer);
+        //create count element
         var count = document.createElement("span");
         count.innerHTML = currentImg + 1 + "/" + uploadedImages.length;
         count.id = "theCount";
         document.getElementById("app").appendChild(count);
+        //create skip button
+        var skipBtn = document.createElement("button");
+        skipBtn.innerHTML = "skip";
+        skipBtn.addEventListener("click", skipImg);
+        skipBtn.id = "skipBtn";
+        document.getElementById("app").appendChild(skipBtn);
         nextImg();
     }
     else {
@@ -73,32 +88,45 @@ function startApp() {
         }
     }
 }
+////////////////////
+////RUNNING
+///////////////////
+var skipped = false;
+function skipImg() {
+    skipped = true;
+}
 function startTimer() {
     var timer = document.getElementById("timer");
     var seconds = minutes * 60;
     var secondsDummy = seconds;
+    //runs every second
     function downTick() {
-        secondsDummy = secondsDummy - 1;
-        timer.innerHTML = new Date(secondsDummy * 1000)
-            .toISOString()
-            .substr(14, 5)
-            .toString();
-        console.log(secondsDummy);
-        if (secondsDummy == 60) {
-            var minuteWarning = document.getElementById("oneMin");
-            minuteWarning.volume = musicVolume;
-            minuteWarning.play();
+        if (skipped == false) {
+            secondsDummy = secondsDummy - 1;
+            timer.innerHTML = new Date(secondsDummy * 1000)
+                .toISOString()
+                .substr(14, 5)
+                .toString();
+            if (secondsDummy == 60) {
+                var minuteWarning = document.getElementById("oneMin");
+                minuteWarning.volume = musicVolume;
+                minuteWarning.play();
+            }
+            else if (secondsDummy <= 3 && secondsDummy != 0) {
+                var tok = document.getElementById("tok");
+                tok.volume = musicVolume;
+                tok.play();
+            }
         }
-        else if (secondsDummy <= 3 && secondsDummy != 0) {
-            console.log("trig");
-            var tok = document.getElementById("tok");
-            tok.volume = musicVolume;
-            tok.play();
+        else {
+            skipped = false;
+            clearInterval(timeBomb);
+            clearTimeout(explosion);
+            timerOut();
         }
     }
     var timeBomb = setInterval(downTick, 1000);
-    setTimeout(function () {
-        clearInterval(timeBomb);
+    function timerOut() {
         if (currentImg + 1 != uploadedImages.length) {
             timer.innerHTML = new Date(minutes * 60 * 1000)
                 .toISOString()
@@ -116,6 +144,11 @@ function startTimer() {
             endMusic.volume = musicVolume;
             endMusic.play();
         }
+    }
+    //runs after timer has run out
+    var explosion = setTimeout(function () {
+        clearInterval(timeBomb);
+        timerOut();
     }, minutes * 60 * 1000);
 }
 function nextImg() {

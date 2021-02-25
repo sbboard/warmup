@@ -76,6 +76,13 @@ function startApp() {
     count.id = "theCount";
     document.getElementById("app").appendChild(count);
 
+    //create skip button
+    let skipBtn = document.createElement("button") as HTMLButtonElement;
+    skipBtn.innerHTML = "skip";
+    skipBtn.addEventListener("click", skipImg);
+    skipBtn.id = "skipBtn";
+    document.getElementById("app").appendChild(skipBtn);
+
     nextImg();
   } else {
     if (imgNum < 1) {
@@ -90,34 +97,48 @@ function startApp() {
 ////RUNNING
 ///////////////////
 
+let skipped: boolean = false;
+
+function skipImg() {
+  skipped = true;
+}
+
 function startTimer() {
   let timer = document.getElementById("timer");
   let seconds = minutes * 60;
   let secondsDummy = seconds;
 
+  //runs every second
   function downTick() {
-    secondsDummy = secondsDummy - 1;
-    timer.innerHTML = new Date(secondsDummy * 1000)
-      .toISOString()
-      .substr(14, 5)
-      .toString();
+    if (skipped == false) {
+      secondsDummy = secondsDummy - 1;
+      timer.innerHTML = new Date(secondsDummy * 1000)
+        .toISOString()
+        .substr(14, 5)
+        .toString();
 
-    console.log(secondsDummy);
-    if (secondsDummy == 60) {
-      let minuteWarning = document.getElementById("oneMin") as HTMLAudioElement;
-      minuteWarning.volume = musicVolume;
-      minuteWarning.play();
-    } else if (secondsDummy <= 3 && secondsDummy != 0) {
-      console.log("trig");
-      let tok = document.getElementById("tok") as HTMLAudioElement;
-      tok.volume = musicVolume;
-      tok.play();
+      if (secondsDummy == 60) {
+        let minuteWarning = document.getElementById(
+          "oneMin"
+        ) as HTMLAudioElement;
+        minuteWarning.volume = musicVolume;
+        minuteWarning.play();
+      } else if (secondsDummy <= 3 && secondsDummy != 0) {
+        let tok = document.getElementById("tok") as HTMLAudioElement;
+        tok.volume = musicVolume;
+        tok.play();
+      }
+    } else {
+      skipped = false;
+      clearInterval(timeBomb);
+      clearTimeout(explosion);
+      timerOut();
     }
   }
 
   let timeBomb = setInterval(downTick, 1000);
-  setTimeout(function () {
-    clearInterval(timeBomb);
+
+  function timerOut() {
     if (currentImg + 1 != uploadedImages.length) {
       timer.innerHTML = new Date(minutes * 60 * 1000)
         .toISOString()
@@ -134,6 +155,12 @@ function startTimer() {
       endMusic.volume = musicVolume;
       endMusic.play();
     }
+  }
+
+  //runs after timer has run out
+  let explosion = setTimeout(function () {
+    clearInterval(timeBomb);
+    timerOut();
   }, minutes * 60 * 1000);
 }
 
