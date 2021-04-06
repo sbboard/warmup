@@ -86,7 +86,7 @@ function startApp() {
 
     //create add 5 minutes button
     let addFiveMin = document.createElement("button") as HTMLButtonElement;
-    addFiveMin.innerHTML = "add 5 minutes";
+    addFiveMin.innerHTML = "add 3 minutes";
     addFiveMin.addEventListener("click", addFive);
     addFiveMin.id = "addFive";
     document.getElementById("app").appendChild(addFiveMin);
@@ -112,7 +112,7 @@ function skipImg() {
 }
 
 function addFive() {
-  minToAdd += 5;
+  minToAdd += 3;
   let fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
   fiveBtn.disabled = true;
 }

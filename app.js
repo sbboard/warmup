@@ -80,7 +80,7 @@ function startApp() {
         document.getElementById("app").appendChild(skipBtn);
         //create add 5 minutes button
         var addFiveMin = document.createElement("button");
-        addFiveMin.innerHTML = "add 5 minutes";
+        addFiveMin.innerHTML = "add 3 minutes";
         addFiveMin.addEventListener("click", addFive);
         addFiveMin.id = "addFive";
         document.getElementById("app").appendChild(addFiveMin);
@@ -103,7 +103,7 @@ function skipImg() {
     skipped = true;
 }
 function addFive() {
-    minToAdd += 5;
+    minToAdd += 3;
     var fiveBtn = document.getElementById("addFive");
     fiveBtn.disabled = true;
 }
