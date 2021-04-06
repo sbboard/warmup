@@ -8,6 +8,7 @@ var currentImg = -1;
 var nextSFX = document.getElementById("nextSFX");
 var musicVolume = 0.2;
 nextSFX.volume = musicVolume;
+var minToAdd = 0;
 /////////////
 //////START UP
 ////////////
@@ -77,6 +78,12 @@ function startApp() {
         skipBtn.addEventListener("click", skipImg);
         skipBtn.id = "skipBtn";
         document.getElementById("app").appendChild(skipBtn);
+        //create add 5 minutes button
+        var addFiveMin = document.createElement("button");
+        addFiveMin.innerHTML = "add 5 minutes";
+        addFiveMin.addEventListener("click", addFive);
+        addFiveMin.id = "addFive";
+        document.getElementById("app").appendChild(addFiveMin);
         nextImg();
     }
     else {
@@ -95,13 +102,26 @@ var skipped = false;
 function skipImg() {
     skipped = true;
 }
+function addFive() {
+    minToAdd += 5;
+    var fiveBtn = document.getElementById("addFive");
+    fiveBtn.disabled = true;
+}
 function startTimer() {
     var timer = document.getElementById("timer");
     var seconds = minutes * 60;
     var secondsDummy = seconds;
     //runs every second
     function downTick() {
+        //if it's not skipped
         if (skipped == false) {
+            //check if any minutes have been added
+            if (minToAdd > 0) {
+                secondsDummy += minToAdd * 60;
+                minToAdd = 0;
+                var fiveBtn = document.getElementById("addFive");
+                fiveBtn.disabled = false;
+            }
             secondsDummy = secondsDummy - 1;
             timer.innerHTML = new Date(secondsDummy * 1000)
                 .toISOString()
@@ -118,11 +138,14 @@ function startTimer() {
                 tok.play();
             }
         }
+        //if skipped it triggered
         else {
             skipped = false;
-            clearInterval(timeBomb);
-            clearTimeout(explosion);
-            timerOut();
+            explosion();
+        }
+        console.log(secondsDummy);
+        if (secondsDummy == 0) {
+            explosion();
         }
     }
     var timeBomb = setInterval(downTick, 1000);
@@ -145,11 +168,10 @@ function startTimer() {
             endMusic.play();
         }
     }
-    //runs after timer has run out
-    var explosion = setTimeout(function () {
+    function explosion() {
         clearInterval(timeBomb);
         timerOut();
-    }, minutes * 60 * 1000);
+    }
 }
 function nextImg() {
     currentImg++;

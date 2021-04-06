@@ -8,6 +8,7 @@ let currentImg: number = -1;
 let nextSFX = document.getElementById("nextSFX") as HTMLAudioElement;
 const musicVolume = 0.2;
 nextSFX.volume = musicVolume;
+let minToAdd: number = 0;
 
 /////////////
 //////START UP
@@ -83,6 +84,13 @@ function startApp() {
     skipBtn.id = "skipBtn";
     document.getElementById("app").appendChild(skipBtn);
 
+    //create add 5 minutes button
+    let addFiveMin = document.createElement("button") as HTMLButtonElement;
+    addFiveMin.innerHTML = "add 5 minutes";
+    addFiveMin.addEventListener("click", addFive);
+    addFiveMin.id = "addFive";
+    document.getElementById("app").appendChild(addFiveMin);
+
     nextImg();
   } else {
     if (imgNum < 1) {
@@ -103,6 +111,12 @@ function skipImg() {
   skipped = true;
 }
 
+function addFive() {
+  minToAdd += 5;
+  let fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
+  fiveBtn.disabled = true;
+}
+
 function startTimer() {
   let timer = document.getElementById("timer");
   let seconds = minutes * 60;
@@ -110,7 +124,15 @@ function startTimer() {
 
   //runs every second
   function downTick() {
+    //if it's not skipped
     if (skipped == false) {
+      //check if any minutes have been added
+      if (minToAdd > 0) {
+        secondsDummy += minToAdd * 60;
+        minToAdd = 0;
+        let fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
+        fiveBtn.disabled = false;
+      }
       secondsDummy = secondsDummy - 1;
       timer.innerHTML = new Date(secondsDummy * 1000)
         .toISOString()
@@ -128,11 +150,15 @@ function startTimer() {
         tok.volume = musicVolume;
         tok.play();
       }
-    } else {
+    }
+    //if skipped it triggered
+    else {
       skipped = false;
-      clearInterval(timeBomb);
-      clearTimeout(explosion);
-      timerOut();
+      explosion();
+    }
+    console.log(secondsDummy);
+    if (secondsDummy == 0) {
+      explosion();
     }
   }
 
@@ -157,11 +183,10 @@ function startTimer() {
     }
   }
 
-  //runs after timer has run out
-  let explosion = setTimeout(function () {
+  function explosion() {
     clearInterval(timeBomb);
     timerOut();
-  }, minutes * 60 * 1000);
+  }
 }
 
 function nextImg() {

@@ -102,10 +102,14 @@ body {
   to {
     padding-top: 0;
     opacity: 1; } }
-#skipBtn {
+#skipBtn, #addFive {
   position: absolute;
-  top: 2em;
+  top: 4em;
   width: 3.25em;
   right: 1em; }
+
+#addFive {
+  top: 2em;
+  width: fit-content; }
 
 /*# sourceMappingURL=style.css.map */
