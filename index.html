@@ -27,12 +27,28 @@
           max="25"
           min="1"
         /><br />
+        <input
+          onchange="changePauseEnd(this)"
+          type="checkbox"
+          id="pauseEnd"
+          name="pauseEnd"
+          value="pauseEnd"
+        />
+        <label for="pauseEnd">no timer on last image</label><br />
         total warm-up time: <span id="totalTime">0</span> minutes<br />
         <button onclick="startApp()">Go</button>
       </div>
     </div>
-    <audio id="endMusic" src="./sfx/AlarmReliefSupplies01.wav" preload="auto"></audio>
-    <audio id="nextSFX" src="./sfx/AlarmReliefSupplies00.wav" preload="auto"></audio>
+    <audio
+      id="endMusic"
+      src="./sfx/AlarmReliefSupplies01.wav"
+      preload="auto"
+    ></audio>
+    <audio
+      id="nextSFX"
+      src="./sfx/AlarmReliefSupplies00.wav"
+      preload="auto"
+    ></audio>
     <audio id="oneMin" src="./sfx/bellcmp01.wav" preload="auto"></audio>
     <audio id="tok" src="./sfx/MiniG_Nomal_CL.wav" preload="auto"></audio>
     <script src="app.js"></script>

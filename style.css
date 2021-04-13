@@ -112,4 +112,7 @@ body {
   top: 2em;
   width: fit-content; }
 
+#pauseEnd {
+  -webkit-appearance: auto; }
+
 /*# sourceMappingURL=style.css.map */

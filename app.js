@@ -1,6 +1,7 @@
 var imgNum = 0;
 var uploadedImages = [];
 var minutes = 10;
+var minutesDupe = 10;
 var timeCalc = 0;
 var fileTag = document.getElementById("filetag");
 var minPerImg = document.getElementById("minPerImg");
@@ -8,7 +9,9 @@ var currentImg = -1;
 var nextSFX = document.getElementById("nextSFX");
 var musicVolume = 0.2;
 nextSFX.volume = musicVolume;
-var minToAdd = 0;
+var paused = false;
+var timeLeft = 0;
+var noTimerLast = false;
 /////////////
 //////START UP
 ////////////
@@ -22,6 +25,7 @@ function changeMinPerImg(input) {
         }
         else {
             minutes = parseInt(input.value);
+            minutesDupe = parseInt(input.value);
             timeCalc = imgNum * parseInt(input.value);
             document.getElementById("totalTime").innerHTML = timeCalc.toString();
         }
@@ -29,6 +33,9 @@ function changeMinPerImg(input) {
     else {
         document.getElementById("totalTime").innerHTML = "0";
     }
+}
+function changePauseEnd(input) {
+    noTimerLast = input.checked;
 }
 function changeImage(input) {
     if (input.files) {
@@ -80,7 +87,7 @@ function startApp() {
         document.getElementById("app").appendChild(skipBtn);
         //create add 5 minutes button
         var addFiveMin = document.createElement("button");
-        addFiveMin.innerHTML = "add 3 minutes";
+        addFiveMin.innerHTML = "pause timer";
         addFiveMin.addEventListener("click", addFive);
         addFiveMin.id = "addFive";
         document.getElementById("app").appendChild(addFiveMin);
@@ -103,9 +110,21 @@ function skipImg() {
     skipped = true;
 }
 function addFive() {
-    minToAdd += 3;
     var fiveBtn = document.getElementById("addFive");
-    fiveBtn.disabled = true;
+    var skipBtn = document.getElementById("skipBtn");
+    if (paused == false) {
+        paused = true;
+        fiveBtn.innerHTML = "start timer";
+        fiveBtn.disabled = true;
+        skipBtn.disabled = true;
+    }
+    else {
+        startTimer();
+        paused = false;
+        fiveBtn.innerHTML = "pause timer";
+        fiveBtn.disabled = true;
+        skipBtn.disabled = false;
+    }
 }
 function startTimer() {
     var timer = document.getElementById("timer");
@@ -113,29 +132,31 @@ function startTimer() {
     var secondsDummy = seconds;
     //runs every second
     function downTick() {
+        var fiveBtn = document.getElementById("addFive");
+        fiveBtn.disabled = false;
         //if it's not skipped
         if (skipped == false) {
             //check if any minutes have been added
-            if (minToAdd > 0) {
-                secondsDummy += minToAdd * 60;
-                minToAdd = 0;
-                var fiveBtn = document.getElementById("addFive");
-                fiveBtn.disabled = false;
+            if (paused == true) {
+                minutes = secondsDummy / 60;
+                clearInterval(timeBomb);
             }
-            secondsDummy = secondsDummy - 1;
-            timer.innerHTML = new Date(secondsDummy * 1000)
-                .toISOString()
-                .substr(14, 5)
-                .toString();
-            if (secondsDummy == 60) {
-                var minuteWarning = document.getElementById("oneMin");
-                minuteWarning.volume = musicVolume;
-                minuteWarning.play();
-            }
-            else if (secondsDummy <= 3 && secondsDummy != 0) {
-                var tok = document.getElementById("tok");
-                tok.volume = musicVolume;
-                tok.play();
+            else {
+                secondsDummy = secondsDummy - 1;
+                timer.innerHTML = new Date(secondsDummy * 1000)
+                    .toISOString()
+                    .substr(14, 5)
+                    .toString();
+                if (secondsDummy == 60) {
+                    var minuteWarning = document.getElementById("oneMin");
+                    minuteWarning.volume = musicVolume;
+                    minuteWarning.play();
+                }
+                else if (secondsDummy <= 3 && secondsDummy != 0) {
+                    var tok = document.getElementById("tok");
+                    tok.volume = musicVolume;
+                    tok.play();
+                }
             }
         }
         //if skipped it triggered
@@ -158,27 +179,43 @@ function startTimer() {
             nextImg();
         }
         else {
-            var endScreen = document.createElement("div");
-            endScreen.id = "endScreen";
-            endScreen.innerHTML = "GOOD WARM-UP!";
-            document.getElementById("app").innerHTML = "";
-            document.getElementById("app").appendChild(endScreen);
-            var endMusic = document.getElementById("endMusic");
-            endMusic.volume = musicVolume;
-            endMusic.play();
+            finish();
         }
     }
     function explosion() {
+        minutes = minutesDupe;
         clearInterval(timeBomb);
         timerOut();
     }
 }
+function finish() {
+    var endScreen = document.createElement("div");
+    endScreen.id = "endScreen";
+    endScreen.innerHTML = "GOOD WARM-UP!";
+    document.getElementById("app").innerHTML = "";
+    document.getElementById("app").appendChild(endScreen);
+    var endMusic = document.getElementById("endMusic");
+    endMusic.volume = musicVolume;
+    endMusic.play();
+}
 function nextImg() {
     currentImg++;
     var count = document.getElementById("theCount");
+    var skipBtn = document.getElementById("skipBtn");
     count.innerHTML = currentImg + 1 + "/" + uploadedImages.length;
     var gallery = document.getElementById("galleryImg");
     gallery.src = uploadedImages[currentImg];
     nextSFX.play();
-    startTimer();
+    if (currentImg + 1 == uploadedImages.length) {
+        skipBtn.innerHTML = "finish";
+    }
+    if (noTimerLast === true && currentImg + 1 == uploadedImages.length) {
+        skipBtn.removeEventListener("click", skipImg);
+        skipBtn.addEventListener("click", finish);
+        var fiveBtn = document.getElementById("addFive");
+        fiveBtn.disabled = true;
+    }
+    else {
+        startTimer();
+    }
 }
