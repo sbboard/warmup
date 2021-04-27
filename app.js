@@ -12,9 +12,6 @@ nextSFX.volume = musicVolume;
 var paused = false;
 var timeLeft = 0;
 var noTimerLast = false;
-/////////////
-//////START UP
-////////////
 function changeMinPerImg(input) {
     if (input.value.length > 0) {
         if (parseInt(input.value) < 1) {
@@ -34,39 +31,62 @@ function changeMinPerImg(input) {
         document.getElementById("totalTime").innerHTML = "0";
     }
 }
+function clearQueue() {
+    document.getElementById("queueNum").innerHTML = "0";
+    uploadedImages = [];
+    imgNum = 0;
+    document.getElementById("thumbnails").innerHTML = "";
+    changeMinPerImg(minPerImg);
+}
 function changePauseEnd(input) {
     noTimerLast = input.checked;
 }
+var currentDown;
+window.addEventListener("mousemove", moving);
+window.addEventListener("mouseup", mouseUp);
+function moving(e) {
+    if (currentDown != null) {
+        e.preventDefault();
+        currentDown.classList.add("dragged");
+        currentDown.style.left = e.clientX - 5 + "px";
+        currentDown.style.top = e.clientY - 5 + "px";
+    }
+}
+function mouseUp() {
+    if (currentDown != null) {
+        currentDown.classList.remove("dragged");
+        currentDown = null;
+    }
+}
 function changeImage(input) {
     if (input.files) {
-        //clear images
-        document.getElementById("thumbnails").innerHTML = "";
-        uploadedImages = [];
-        imgNum = input.files.length;
-        //go through images
+        imgNum += input.files.length;
         for (var i = 0; i < input.files.length; i++) {
             var reader = new FileReader();
             reader.onload = function (e) {
                 uploadedImages.push(e.target.result);
                 var newImg = document.createElement("img");
                 newImg.src = e.target.result;
+                newImg.dataset.madeID = uploadedImages.length.toString();
+                newImg.onmousedown = function () { return (currentDown = event.target); };
+                newImg.onmousemove = function () { return moving(event); };
                 document.getElementById("thumbnails").appendChild(newImg);
             };
             reader.readAsDataURL(input.files[i]);
         }
         document.getElementById("queueNum").innerHTML = imgNum.toString();
         changeMinPerImg(minPerImg);
+        input.value = "";
     }
 }
 function startApp() {
     if (timeCalc > 0) {
-        //clear app
+        window.removeEventListener("mousemove", moving);
+        window.removeEventListener("mouseup", mouseUp);
         document.getElementById("app").innerHTML = "";
-        //create image element
         var bigImg = document.createElement("img");
         bigImg.id = "galleryImg";
         document.getElementById("app").appendChild(bigImg);
-        //create timer element
         var timer = document.createElement("span");
         timer.innerHTML = new Date(minutes * 60 * 1000)
             .toISOString()
@@ -74,18 +94,15 @@ function startApp() {
             .toString();
         timer.id = "timer";
         document.getElementById("app").appendChild(timer);
-        //create count element
         var count = document.createElement("span");
         count.innerHTML = currentImg + 1 + "/" + uploadedImages.length;
         count.id = "theCount";
         document.getElementById("app").appendChild(count);
-        //create skip button
         var skipBtn = document.createElement("button");
         skipBtn.innerHTML = "skip";
         skipBtn.addEventListener("click", skipImg);
         skipBtn.id = "skipBtn";
         document.getElementById("app").appendChild(skipBtn);
-        //create add 5 minutes button
         var addFiveMin = document.createElement("button");
         addFiveMin.innerHTML = "pause timer";
         addFiveMin.addEventListener("click", addFive);
@@ -102,9 +119,6 @@ function startApp() {
         }
     }
 }
-////////////////////
-////RUNNING
-///////////////////
 var skipped = false;
 function skipImg() {
     skipped = true;
@@ -130,13 +144,10 @@ function startTimer() {
     var timer = document.getElementById("timer");
     var seconds = minutes * 60;
     var secondsDummy = seconds;
-    //runs every second
     function downTick() {
         var fiveBtn = document.getElementById("addFive");
         fiveBtn.disabled = false;
-        //if it's not skipped
         if (skipped == false) {
-            //check if any minutes have been added
             if (paused == true) {
                 minutes = secondsDummy / 60;
                 clearInterval(timeBomb);
@@ -159,12 +170,10 @@ function startTimer() {
                 }
             }
         }
-        //if skipped it triggered
         else {
             skipped = false;
             explosion();
         }
-        console.log(secondsDummy);
         if (secondsDummy == 0) {
             explosion();
         }

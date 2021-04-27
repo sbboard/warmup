@@ -44,7 +44,12 @@ input {
   #thumbnails img {
     max-height: 200px;
     width: auto;
-    margin-right: 0.5em; }
+    margin-right: 0.5em;
+    transition: width 0.1s, max-height 0.1s, height 0.1s; }
+  #thumbnails img.dragged {
+    max-height: 50px;
+    width: auto;
+    position: absolute; }
 
 #galleryImg {
   object-fit: contain;
@@ -83,6 +88,10 @@ input {
   #startScreen button {
     width: 200px;
     margin-top: 1em; }
+  #startScreen #clrQueue {
+    width: fit-content; }
+  #startScreen #filetag {
+    color: transparent; }
 
 body {
   line-height: 0;

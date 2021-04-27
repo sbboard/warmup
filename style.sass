@@ -46,6 +46,11 @@ input
         max-height: 200px
         width: auto
         margin-right: .5em
+        transition: width .1s, max-height .1s, height .1s
+    img.dragged
+        max-height: 50px
+        width: auto
+        position: absolute
 
 #galleryImg
     object-fit: contain
@@ -80,6 +85,10 @@ input
     button
         width: 200px
         margin-top: 1em
+    #clrQueue
+        width: fit-content
+    #filetag
+        color: transparent
 body
     line-height: 0
     font-family: 'Roboto', sans-serif

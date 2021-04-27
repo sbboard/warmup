@@ -33,17 +33,42 @@ function changeMinPerImg(input: HTMLInputElement) {
   }
 }
 
+function clearQueue() {
+  document.getElementById("queueNum").innerHTML = "0";
+  uploadedImages = [];
+  imgNum = 0;
+  document.getElementById("thumbnails").innerHTML = "";
+  changeMinPerImg(minPerImg);
+}
+
 function changePauseEnd(input: HTMLInputElement) {
   noTimerLast = input.checked;
 }
 
+let currentDown: HTMLElement;
+
+window.addEventListener("mousemove", moving);
+window.addEventListener("mouseup", mouseUp);
+
+function moving(e: MouseEvent) {
+  if (currentDown != null) {
+    e.preventDefault();
+    currentDown.classList.add("dragged");
+    currentDown.style.left = `${e.clientX - 5}px`;
+    currentDown.style.top = `${e.clientY - 5}px`;
+  }
+}
+
+function mouseUp() {
+  if (currentDown != null) {
+    currentDown.classList.remove("dragged");
+    currentDown = null;
+  }
+}
+
 function changeImage(input: HTMLInputElement) {
   if (input.files) {
-    //clear images
-    document.getElementById("thumbnails").innerHTML = "";
-    uploadedImages = [];
-
-    imgNum = input.files.length;
+    imgNum += input.files.length;
     //go through images
     for (let i = 0; i < input.files.length; i++) {
       let reader = new FileReader();
@@ -51,17 +76,24 @@ function changeImage(input: HTMLInputElement) {
         uploadedImages.push(e.target.result as string);
         var newImg = document.createElement("img") as HTMLImageElement;
         newImg.src = e.target.result as string;
+        newImg.dataset.madeID = uploadedImages.length.toString();
+        newImg.onmousedown = () => (currentDown = event.target as HTMLElement);
+        newImg.onmousemove = () => moving(event as MouseEvent);
         document.getElementById("thumbnails").appendChild(newImg);
       };
       reader.readAsDataURL(input.files[i]);
     }
     document.getElementById("queueNum").innerHTML = imgNum.toString();
     changeMinPerImg(minPerImg);
+    input.value = "";
   }
 }
 
 function startApp() {
   if (timeCalc > 0) {
+    window.removeEventListener("mousemove", moving);
+    window.removeEventListener("mouseup", mouseUp);
+
     //clear app
     document.getElementById("app").innerHTML = "";
 
@@ -176,7 +208,6 @@ function startTimer() {
       skipped = false;
       explosion();
     }
-    console.log(secondsDummy);
     if (secondsDummy == 0) {
       explosion();
     }
