@@ -54,16 +54,51 @@ function moving(e: MouseEvent) {
   if (currentDown != null) {
     e.preventDefault();
     currentDown.classList.add("dragged");
-    currentDown.style.left = `${e.clientX - 5}px`;
-    currentDown.style.top = `${e.clientY - 5}px`;
+    currentDown.style.left = `${e.clientX - 10}px`;
+    currentDown.style.top = `${e.clientY - 10}px`;
   }
 }
 
-function mouseUp() {
+function arraymove(arr, fromIndex, toIndex) {
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+}
+
+function mouseUp(event: MouseEvent) {
   if (currentDown != null) {
+    let currentDownNum = parseInt(currentDown.dataset.made);
     currentDown.classList.remove("dragged");
     currentDown = null;
+    let clientX = event.clientX;
+    let clientY = event.clientY;
+    //get list of elements
+    for (let i = 0; uploadedImages.length > i; i++) {
+      if (i != currentDownNum) {
+        let currentElm = document.querySelectorAll(
+          `[data-made="${i.toString()}"]`
+        )[0];
+        let elmBox = currentElm.getBoundingClientRect();
+        if (elmBox.right > clientX) {
+          arraymove(uploadedImages, currentDownNum, i);
+          renderThumbs();
+          break;
+        }
+      }
+    }
   }
+}
+
+function renderThumbs() {
+  document.getElementById("thumbnails").innerHTML = "";
+  uploadedImages.map((value, index) => {
+    var newImg = document.createElement("img") as HTMLImageElement;
+    newImg.src = value;
+    newImg.dataset.made = index.toString();
+    newImg.onmousedown = () => {(currentDown = event.target as HTMLElement);};
+    newImg.onmousemove = () => moving(event as MouseEvent);
+    document.getElementById("thumbnails").appendChild(newImg);
+  });
 }
 
 function changeImage(input: HTMLInputElement) {
@@ -74,12 +109,7 @@ function changeImage(input: HTMLInputElement) {
       let reader = new FileReader();
       reader.onload = function (e) {
         uploadedImages.push(e.target.result as string);
-        var newImg = document.createElement("img") as HTMLImageElement;
-        newImg.src = e.target.result as string;
-        newImg.dataset.madeID = uploadedImages.length.toString();
-        newImg.onmousedown = () => (currentDown = event.target as HTMLElement);
-        newImg.onmousemove = () => moving(event as MouseEvent);
-        document.getElementById("thumbnails").appendChild(newImg);
+        renderThumbs();
       };
       reader.readAsDataURL(input.files[i]);
     }
@@ -88,6 +118,10 @@ function changeImage(input: HTMLInputElement) {
     input.value = "";
   }
 }
+
+///////////////
+//////PRESS START
+//////////////
 
 function startApp() {
   if (timeCalc > 0) {

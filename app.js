@@ -48,15 +48,45 @@ function moving(e) {
     if (currentDown != null) {
         e.preventDefault();
         currentDown.classList.add("dragged");
-        currentDown.style.left = e.clientX - 5 + "px";
-        currentDown.style.top = e.clientY - 5 + "px";
+        currentDown.style.left = e.clientX - 10 + "px";
+        currentDown.style.top = e.clientY - 10 + "px";
     }
 }
-function mouseUp() {
+function arraymove(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+}
+function mouseUp(event) {
     if (currentDown != null) {
+        var currentDownNum = parseInt(currentDown.dataset.made);
         currentDown.classList.remove("dragged");
         currentDown = null;
+        var clientX = event.clientX;
+        var clientY = event.clientY;
+        for (var i = 0; uploadedImages.length > i; i++) {
+            if (i != currentDownNum) {
+                var currentElm = document.querySelectorAll("[data-made=\"" + i.toString() + "\"]")[0];
+                var elmBox = currentElm.getBoundingClientRect();
+                if (elmBox.right > clientX) {
+                    arraymove(uploadedImages, currentDownNum, i);
+                    renderThumbs();
+                    break;
+                }
+            }
+        }
     }
+}
+function renderThumbs() {
+    document.getElementById("thumbnails").innerHTML = "";
+    uploadedImages.map(function (value, index) {
+        var newImg = document.createElement("img");
+        newImg.src = value;
+        newImg.dataset.made = index.toString();
+        newImg.onmousedown = function () { (currentDown = event.target); };
+        newImg.onmousemove = function () { return moving(event); };
+        document.getElementById("thumbnails").appendChild(newImg);
+    });
 }
 function changeImage(input) {
     if (input.files) {
@@ -65,12 +95,7 @@ function changeImage(input) {
             var reader = new FileReader();
             reader.onload = function (e) {
                 uploadedImages.push(e.target.result);
-                var newImg = document.createElement("img");
-                newImg.src = e.target.result;
-                newImg.dataset.madeID = uploadedImages.length.toString();
-                newImg.onmousedown = function () { return (currentDown = event.target); };
-                newImg.onmousemove = function () { return moving(event); };
-                document.getElementById("thumbnails").appendChild(newImg);
+                renderThumbs();
             };
             reader.readAsDataURL(input.files[i]);
         }

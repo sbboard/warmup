@@ -45,7 +45,8 @@ input {
     max-height: 200px;
     width: auto;
     margin-right: 0.5em;
-    transition: width 0.1s, max-height 0.1s, height 0.1s; }
+    transition: width 0.1s, max-height 0.1s, height 0.1s;
+    cursor: move; }
   #thumbnails img.dragged {
     max-height: 50px;
     width: auto;
