@@ -53,6 +53,7 @@ function moving(e) {
     }
 }
 function arraymove(arr, fromIndex, toIndex) {
+    console.log("WO");
     var element = arr[fromIndex];
     arr.splice(fromIndex, 1);
     arr.splice(toIndex, 0, element);
@@ -63,16 +64,24 @@ function mouseUp(event) {
         currentDown.classList.remove("dragged");
         currentDown = null;
         var clientX = event.clientX;
-        var clientY = event.clientY;
         for (var i = 0; uploadedImages.length > i; i++) {
             if (i != currentDownNum) {
                 var currentElm = document.querySelectorAll("[data-made=\"" + i.toString() + "\"]")[0];
                 var elmBox = currentElm.getBoundingClientRect();
                 if (elmBox.right > clientX) {
-                    arraymove(uploadedImages, currentDownNum, i);
+                    if (currentDownNum > i) {
+                        arraymove(uploadedImages, currentDownNum, i);
+                    }
+                    else {
+                        arraymove(uploadedImages, currentDownNum, i);
+                    }
                     renderThumbs();
                     break;
                 }
+            }
+            if (i == uploadedImages.length - 1) {
+                arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
+                renderThumbs();
             }
         }
     }
@@ -83,7 +92,9 @@ function renderThumbs() {
         var newImg = document.createElement("img");
         newImg.src = value;
         newImg.dataset.made = index.toString();
-        newImg.onmousedown = function () { (currentDown = event.target); };
+        newImg.onmousedown = function () {
+            currentDown = event.target;
+        };
         newImg.onmousemove = function () { return moving(event); };
         document.getElementById("thumbnails").appendChild(newImg);
     });

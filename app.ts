@@ -60,6 +60,7 @@ function moving(e: MouseEvent) {
 }
 
 function arraymove(arr, fromIndex, toIndex) {
+  console.log("WO");
   var element = arr[fromIndex];
   arr.splice(fromIndex, 1);
   arr.splice(toIndex, 0, element);
@@ -71,7 +72,6 @@ function mouseUp(event: MouseEvent) {
     currentDown.classList.remove("dragged");
     currentDown = null;
     let clientX = event.clientX;
-    let clientY = event.clientY;
     //get list of elements
     for (let i = 0; uploadedImages.length > i; i++) {
       if (i != currentDownNum) {
@@ -80,10 +80,18 @@ function mouseUp(event: MouseEvent) {
         )[0];
         let elmBox = currentElm.getBoundingClientRect();
         if (elmBox.right > clientX) {
-          arraymove(uploadedImages, currentDownNum, i);
+          if (currentDownNum > i) {
+            arraymove(uploadedImages, currentDownNum, i);
+          } else {
+            arraymove(uploadedImages, currentDownNum, i);
+          }
           renderThumbs();
           break;
         }
+      }
+      if (i == uploadedImages.length - 1) {
+        arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
+        renderThumbs();
       }
     }
   }
@@ -95,7 +103,9 @@ function renderThumbs() {
     var newImg = document.createElement("img") as HTMLImageElement;
     newImg.src = value;
     newImg.dataset.made = index.toString();
-    newImg.onmousedown = () => {(currentDown = event.target as HTMLElement);};
+    newImg.onmousedown = () => {
+      currentDown = event.target as HTMLElement;
+    };
     newImg.onmousemove = () => moving(event as MouseEvent);
     document.getElementById("thumbnails").appendChild(newImg);
   });

@@ -38,9 +38,13 @@ input {
   border-radius: 0; }
 
 #thumbnails {
-  width: 100%;
   display: block;
-  padding: 1em 0; }
+  padding: 1em 0;
+  height: calc(200px + 3em);
+  max-width: calc(100vw - 2em);
+  white-space: nowrap;
+  padding: 1em;
+  overflow-y: hidden; }
   #thumbnails img {
     max-height: 200px;
     width: auto;
