@@ -54,13 +54,13 @@ function moving(e: MouseEvent) {
   if (currentDown != null) {
     e.preventDefault();
     currentDown.classList.add("dragged");
+    changeX(currentDown.dataset.made, "0");
     currentDown.style.left = `${e.clientX - 10}px`;
     currentDown.style.top = `${e.clientY - 10}px`;
   }
 }
 
 function arraymove(arr, fromIndex, toIndex) {
-  console.log("WO");
   var element = arr[fromIndex];
   arr.splice(fromIndex, 1);
   arr.splice(toIndex, 0, element);
@@ -80,11 +80,7 @@ function mouseUp(event: MouseEvent) {
         )[0];
         let elmBox = currentElm.getBoundingClientRect();
         if (elmBox.right > clientX) {
-          if (currentDownNum > i) {
-            arraymove(uploadedImages, currentDownNum, i);
-          } else {
-            arraymove(uploadedImages, currentDownNum, i);
-          }
+          arraymove(uploadedImages, currentDownNum, i);
           renderThumbs();
           break;
         }
@@ -101,14 +97,53 @@ function renderThumbs() {
   document.getElementById("thumbnails").innerHTML = "";
   uploadedImages.map((value, index) => {
     var newImg = document.createElement("img") as HTMLImageElement;
+    let newX = document.createElement("img") as HTMLImageElement;
     newImg.src = value;
     newImg.dataset.made = index.toString();
+    newImg.onmouseenter = () => {
+      if (currentDown === null) {
+        changeX(index, "1");
+      }
+    };
+    newImg.onmouseout = () => {
+      changeX(index, "0");
+    };
     newImg.onmousedown = () => {
       currentDown = event.target as HTMLElement;
     };
     newImg.onmousemove = () => moving(event as MouseEvent);
+    newX.src = "./x-btn.png";
+    newX.dataset.btnno = index.toString();
+    newX.classList.add("xBtn");
+    newX.onclick = () => killThumb(index);
+    newX.onmouseenter = () => {
+      if (currentDown === null) {
+        changeX(index, "1");
+      }
+    };
+    newX.onmouseout = () => {
+      changeX(index, "0");
+    };
+    document.getElementById("thumbnails").appendChild(newX);
     document.getElementById("thumbnails").appendChild(newImg);
   });
+}
+
+function changeX(number, value) {
+  let matchingX = document.querySelectorAll(
+    `[data-btnno="${number.toString()}"]`
+  )[0] as HTMLImageElement;
+  matchingX.style.opacity = value;
+}
+
+function killThumb(number) {
+  uploadedImages.splice(number, 1);
+  document.getElementById(
+    "queueNum"
+  ).innerHTML = uploadedImages.length.toString();
+  imgNum = uploadedImages.length;
+  changeMinPerImg(minPerImg);
+  renderThumbs();
 }
 
 function changeImage(input: HTMLInputElement) {

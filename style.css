@@ -43,10 +43,10 @@ input {
   height: calc(200px + 3em);
   max-width: calc(100vw - 2em);
   white-space: nowrap;
-  padding: 1em;
+  padding: 1em 1em 1em 0;
   overflow-y: hidden; }
   #thumbnails img {
-    max-height: 200px;
+    height: 200px;
     width: auto;
     margin-right: 0.5em;
     transition: width 0.1s, max-height 0.1s, height 0.1s;
@@ -55,6 +55,11 @@ input {
     max-height: 50px;
     width: auto;
     position: absolute; }
+  #thumbnails img.xBtn {
+    position: absolute;
+    cursor: pointer;
+    opacity: 0;
+    height: initial; }
 
 #galleryImg {
   object-fit: contain;
