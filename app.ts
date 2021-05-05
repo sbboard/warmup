@@ -45,7 +45,7 @@ function changePauseEnd(input: HTMLInputElement) {
   noTimerLast = input.checked;
 }
 
-let currentDown: HTMLElement;
+let currentDown: HTMLElement = null;
 
 window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);

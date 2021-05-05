@@ -41,7 +41,7 @@ function clearQueue() {
 function changePauseEnd(input) {
     noTimerLast = input.checked;
 }
-var currentDown;
+var currentDown = null;
 window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
 function moving(e) {
