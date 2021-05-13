@@ -1,5 +1,5 @@
 let imgNum: number = 0;
-let uploadedImages: string[] = [];
+let uploadedImages: UploadImg[] = [];
 let minutes: number = 10;
 let minutesDupe: number = 10;
 let timeCalc: number = 0;
@@ -12,6 +12,11 @@ nextSFX.volume = musicVolume;
 let paused: boolean = false;
 let timeLeft: number = 0;
 let noTimerLast: boolean = false;
+
+type UploadImg = {
+  name: string;
+  blob: string;
+};
 
 /////////////
 //////START UP
@@ -95,10 +100,10 @@ function mouseUp(event: MouseEvent) {
 
 function renderThumbs() {
   document.getElementById("thumbnails").innerHTML = "";
-  uploadedImages.map((value, index) => {
+  uploadedImages.map((value: UploadImg, index) => {
     var newImg = document.createElement("img") as HTMLImageElement;
     let newX = document.createElement("img") as HTMLImageElement;
-    newImg.src = value;
+    newImg.src = value.blob;
     newImg.dataset.made = index.toString();
     newImg.onmouseenter = () => {
       if (currentDown === null) {
@@ -138,9 +143,8 @@ function changeX(number, value) {
 
 function killThumb(number) {
   uploadedImages.splice(number, 1);
-  document.getElementById(
-    "queueNum"
-  ).innerHTML = uploadedImages.length.toString();
+  document.getElementById("queueNum").innerHTML =
+    uploadedImages.length.toString();
   imgNum = uploadedImages.length;
   changeMinPerImg(minPerImg);
   renderThumbs();
@@ -152,8 +156,12 @@ function changeImage(input: HTMLInputElement) {
     //go through images
     for (let i = 0; i < input.files.length; i++) {
       let reader = new FileReader();
+      let fileName = input.files[i].name;
       reader.onload = function (e) {
-        uploadedImages.push(e.target.result as string);
+        uploadedImages.push({
+          name: fileName,
+          blob: e.target.result as string,
+        });
         renderThumbs();
       };
       reader.readAsDataURL(input.files[i]);
@@ -189,6 +197,11 @@ function startApp() {
       .toString();
     timer.id = "timer";
     document.getElementById("app").appendChild(timer);
+
+    //create name element
+    let imgName = document.createElement("span") as HTMLDivElement;
+    imgName.id = "imgName";
+    document.getElementById("app").appendChild(imgName);
 
     //create count element
     let count = document.createElement("span") as HTMLDivElement;
@@ -329,10 +342,13 @@ function nextImg() {
 
   let count = document.getElementById("theCount") as HTMLSpanElement;
   let skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
+  let theNowImg: UploadImg = uploadedImages[currentImg];
   count.innerHTML = `${currentImg + 1}/${uploadedImages.length}`;
 
   let gallery = document.getElementById("galleryImg") as HTMLImageElement;
-  gallery.src = uploadedImages[currentImg];
+  let imgName = document.getElementById("imgName") as HTMLImageElement;
+  gallery.src = theNowImg.blob;
+  imgName.innerHTML = theNowImg.name;
   nextSFX.play();
   if (currentImg + 1 == uploadedImages.length) {
     skipBtn.innerHTML = "finish";

@@ -66,11 +66,7 @@ input
     width: 100vw
     height: 100vh
 #timer
-    display: block
-    position: absolute
-    z-index: 255
-    padding: 1em
-    color: white
+    @extend #faceElement
     top: 0
     right: 0
 #app
@@ -101,13 +97,17 @@ input
 body
     line-height: 0
     font-family: 'Roboto', sans-serif
-
-#theCount
-    bottom: 0
-    right: 0
+#faceElement
+    background-color: rgba(0,0,0,.5)
     position: absolute
     z-index: 5
     padding: 1em
+    display: block
+    color: white
+#theCount
+    @extend #faceElement
+    bottom: 0
+    right: 0
 @keyframes fadeup
     from
         padding-top: 3em
@@ -117,13 +117,16 @@ body
         opacity: 1
 #skipBtn
     position: absolute
-    top: 4em
+    top: 5em
     width: 3.25em
     right: 1em
-
 #addFive
     @extend #skipBtn
-    top: 2em
+    top: 3em
     width: fit-content
 #pauseEnd
     -webkit-appearance: auto
+#imgName
+    @extend #faceElement
+    bottom: 0
+    left: 0

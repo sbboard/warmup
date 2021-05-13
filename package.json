@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "lite-server"
+    "dev": "lite-server",
+    "tscmnd": "tsc app.ts --watch --removeComments",
+    "sasscmnd": "sass --watch style.sass:style.css",
+    "minifycmnd": "uglifyjs -c -m --keep-fnames -o app.min.js -- app.js"
   },
   "repository": {
     "type": "git",
