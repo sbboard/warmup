@@ -6,9 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "lite-server",
-    "tscmnd": "tsc app.ts --watch --removeComments",
-    "sasscmnd": "sass --watch style.sass:style.css",
-    "minifycmnd": "uglifyjs -c -m --keep-fnames -o app.min.js -- app.js"
+    "tsc": "tsc app.ts --watch --removeComments",
+    "sass": "sass --watch style.sass:style.css",
+    "minify": "uglifyjs -c -m --keep-fnames -o app.min.js -- app.js",
+    "postcss": "postcss style.css --use autoprefixer -r"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,12 @@
   },
   "homepage": "https://github.com/sbboard/warmup#readme",
   "devDependencies": {
-    "lite-server": "^2.6.1"
+    "lite-server": "^2.6.1",
+    "postcss": "^8.3.2",
+    "postcss-cli": "^8.3.1",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.2.6"
   }
 }

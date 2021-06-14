@@ -12,6 +12,7 @@ nextSFX.volume = musicVolume;
 let paused: boolean = false;
 let timeLeft: number = 0;
 let noTimerLast: boolean = false;
+const btnOpacityOff: number = 0;
 
 type UploadImg = {
   name: string;
@@ -59,7 +60,7 @@ function moving(e: MouseEvent) {
   if (currentDown != null) {
     e.preventDefault();
     currentDown.classList.add("dragged");
-    changeX(currentDown.dataset.made, "0");
+    changeX(currentDown.dataset.made, btnOpacityOff);
     currentDown.style.left = `${e.clientX - 10}px`;
     currentDown.style.top = `${e.clientY - 10}px`;
   }
@@ -111,7 +112,7 @@ function renderThumbs() {
       }
     };
     newImg.onmouseout = () => {
-      changeX(index, "0");
+      changeX(index, btnOpacityOff);
     };
     newImg.onmousedown = () => {
       currentDown = event.target as HTMLElement;
@@ -127,7 +128,7 @@ function renderThumbs() {
       }
     };
     newX.onmouseout = () => {
-      changeX(index, "0");
+      changeX(index, btnOpacityOff);
     };
     document.getElementById("thumbnails").appendChild(newX);
     document.getElementById("thumbnails").appendChild(newImg);

@@ -12,6 +12,7 @@ nextSFX.volume = musicVolume;
 var paused = false;
 var timeLeft = 0;
 var noTimerLast = false;
+var btnOpacityOff = 0;
 function changeMinPerImg(input) {
     if (input.value.length > 0) {
         if (parseInt(input.value) < 1) {
@@ -48,7 +49,7 @@ function moving(e) {
     if (currentDown != null) {
         e.preventDefault();
         currentDown.classList.add("dragged");
-        changeX(currentDown.dataset.made, "0");
+        changeX(currentDown.dataset.made, btnOpacityOff);
         currentDown.style.left = e.clientX - 10 + "px";
         currentDown.style.top = e.clientY - 10 + "px";
     }
@@ -94,7 +95,7 @@ function renderThumbs() {
             }
         };
         newImg.onmouseout = function () {
-            changeX(index, "0");
+            changeX(index, btnOpacityOff);
         };
         newImg.onmousedown = function () {
             currentDown = event.target;
@@ -110,7 +111,7 @@ function renderThumbs() {
             }
         };
         newX.onmouseout = function () {
-            changeX(index, "0");
+            changeX(index, btnOpacityOff);
         };
         document.getElementById("thumbnails").appendChild(newX);
         document.getElementById("thumbnails").appendChild(newImg);
