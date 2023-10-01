@@ -18,12 +18,19 @@
         />
 
         <div id="chooseForMe">
-          <button onclick="document.getElementById('getFile').click()">
+          <button onclick="document.getElementById('chooseFile').click()">
             Choose For Me
           </button>
           <input min="1" value="1" max="9" type="number" id="chooseNum" />
+          <input
+            type="file"
+            multiple
+            id="chooseFile"
+            onchange="changeImage(this)"
+            accept="image/x-png,image/gif,image/jpeg"
+            style="display: none"
+          />
         </div>
-        <input type="file" id="getFile" style="display: none" />
         <div id="thumbnails"></div>
         images in queue: <span id="queueNum">0</span>
         <button id="clrQueue" onclick="clearQueue()" disabled>
