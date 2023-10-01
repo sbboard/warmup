@@ -242,12 +242,6 @@ function startApp() {
 
     // Load the next image
     nextImg();
-  } else {
-    if (uploadedImages.length < 1) {
-      alert("Upload Images First");
-    } else {
-      alert("Timer set to 0");
-    }
   }
 }
 
