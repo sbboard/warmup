@@ -8,7 +8,6 @@
     "dev": "lite-server",
     "tsc": "tsc app.ts --watch --removeComments",
     "sass": "sass --watch style.sass:style.css",
-    "minify": "uglifyjs -c -m --keep-fnames -o app.min.js -- app.js",
     "postcss": "postcss style.css --use autoprefixer -r"
   },
   "repository": {

@@ -18,7 +18,9 @@
         />
         <div id="thumbnails"></div>
         images in queue: <span id="queueNum">0</span>
-        <button id="clrQueue" onclick="clearQueue()">clear queue</button><br />
+        <button id="clrQueue" onclick="clearQueue()" disabled>
+          clear queue</button
+        ><br />
         <label for="minPerImg">minutes per image: </label
         ><input
           id="minPerImg"
@@ -52,6 +54,6 @@
     ></audio>
     <audio id="oneMin" src="./sfx/bellcmp01.wav" preload="auto"></audio>
     <audio id="tok" src="./sfx/MiniG_Nomal_CL.wav" preload="auto"></audio>
-    <script src="app.min.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

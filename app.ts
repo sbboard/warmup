@@ -1,12 +1,18 @@
+const appElement = document.querySelector("#app");
+const fileTag = document.querySelector("#filetag") as HTMLInputElement;
+const minPerImg = document.querySelector("#minPerImg") as HTMLInputElement;
+const nextSFX = document.querySelector("#nextSFX") as HTMLAudioElement;
+const totalTimeElement = document.querySelector("#totalTime") as HTMLElement;
+const clearInput = document.querySelector("#clrQueue") as HTMLButtonElement;
+const numEl = document.querySelector("#queueNum");
+const thumbnailsContainer = document.querySelector("#thumbnails");
+
 let imgNum: number = 0;
 let uploadedImages: UploadImg[] = [];
 let minutes: number = 10;
 let minutesDupe: number = 10;
 let timeCalc: number = 0;
-let fileTag = <HTMLInputElement>document.getElementById("filetag");
-let minPerImg = <HTMLInputElement>document.getElementById("minPerImg");
 let currentImg: number = -1;
-let nextSFX = document.getElementById("nextSFX") as HTMLAudioElement;
 const musicVolume = 0.2;
 nextSFX.volume = musicVolume;
 let paused: boolean = false;
@@ -23,27 +29,26 @@ type UploadImg = {
 //////START UP
 ////////////
 function changeMinPerImg(input: HTMLInputElement) {
-  if (input.value.length > 0) {
-    if (parseInt(input.value) < 1) {
-      input.value = "1";
-    } else if (parseInt(input.value) > 25) {
-      input.value = "25";
-    } else {
-      minutes = parseInt(input.value);
-      minutesDupe = parseInt(input.value);
-      timeCalc = imgNum * parseInt(input.value);
-      document.getElementById("totalTime").innerHTML = timeCalc.toString();
-    }
-  } else {
-    document.getElementById("totalTime").innerHTML = "0";
+  if (!totalTimeElement) return;
+  const inputValue = input.value.trim();
+  const inputValueAsNumber = parseInt(inputValue, 10);
+  if (inputValue.length === 0 || isNaN(inputValueAsNumber)) {
+    totalTimeElement.innerHTML = "0";
+    return;
   }
+  const clampedValue = Math.min(Math.max(inputValueAsNumber, 1), 25);
+  input.value = clampedValue.toString();
+  const minutes = clampedValue;
+  const timeCalc = imgNum * minutes;
+  totalTimeElement.innerHTML = timeCalc.toString();
 }
 
 function clearQueue() {
-  document.getElementById("queueNum").innerHTML = "0";
+  if (numEl) numEl.innerHTML = "0";
   uploadedImages = [];
   imgNum = 0;
-  document.getElementById("thumbnails").innerHTML = "";
+  clearInput.disabled = true;
+  if (thumbnailsContainer) thumbnailsContainer.innerHTML = "";
   changeMinPerImg(minPerImg);
 }
 
@@ -51,7 +56,7 @@ function changePauseEnd(input: HTMLInputElement) {
   noTimerLast = input.checked;
 }
 
-let currentDown: HTMLElement = null;
+let currentDown: HTMLElement | null = null;
 
 window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
@@ -73,25 +78,24 @@ function arraymove(arr, fromIndex, toIndex) {
 }
 
 function mouseUp(event: MouseEvent) {
-  if (currentDown != null) {
-    let currentDownNum = parseInt(currentDown.dataset.made);
+  if (currentDown !== null) {
+    const currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
     currentDown.classList.remove("dragged");
     currentDown = null;
-    let clientX = event.clientX;
-    //get list of elements
-    for (let i = 0; uploadedImages.length > i; i++) {
-      if (i != currentDownNum) {
-        let currentElm = document.querySelectorAll(
-          `[data-made="${i.toString()}"]`
-        )[0];
-        let elmBox = currentElm.getBoundingClientRect();
-        if (elmBox.right > clientX) {
-          arraymove(uploadedImages, currentDownNum, i);
-          renderThumbs();
-          break;
+    const clientX = event.clientX;
+    for (let i = 0; i < uploadedImages.length; i++) {
+      if (i !== currentDownNum) {
+        const currentElm = document.querySelector(`[data-made="${i}"]`);
+        if (currentElm) {
+          const elmBox = currentElm.getBoundingClientRect();
+          if (elmBox.right > clientX) {
+            arraymove(uploadedImages, currentDownNum, i);
+            renderThumbs();
+            break;
+          }
         }
       }
-      if (i == uploadedImages.length - 1) {
+      if (i === uploadedImages.length - 1) {
         arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
         renderThumbs();
       }
@@ -100,39 +104,44 @@ function mouseUp(event: MouseEvent) {
 }
 
 function renderThumbs() {
-  document.getElementById("thumbnails").innerHTML = "";
-  uploadedImages.map((value: UploadImg, index) => {
-    var newImg = document.createElement("img") as HTMLImageElement;
-    let newX = document.createElement("img") as HTMLImageElement;
-    newImg.src = value.blob;
-    newImg.dataset.made = index.toString();
-    newImg.onmouseenter = () => {
-      if (currentDown === null) {
-        changeX(index, "1");
-      }
-    };
-    newImg.onmouseout = () => {
-      changeX(index, btnOpacityOff);
-    };
-    newImg.onmousedown = () => {
-      currentDown = event.target as HTMLElement;
-    };
-    newImg.onmousemove = () => moving(event as MouseEvent);
-    newX.src = "./x-btn.png";
-    newX.dataset.btnno = index.toString();
-    newX.classList.add("xBtn");
-    newX.onclick = () => killThumb(index);
-    newX.onmouseenter = () => {
-      if (currentDown === null) {
-        changeX(index, "1");
-      }
-    };
-    newX.onmouseout = () => {
-      changeX(index, btnOpacityOff);
-    };
-    document.getElementById("thumbnails").appendChild(newX);
-    document.getElementById("thumbnails").appendChild(newImg);
-  });
+  if (!thumbnailsContainer) return;
+  thumbnailsContainer.innerHTML = "";
+  if (uploadedImages.length > 0) {
+    uploadedImages.forEach((value: UploadImg, index) => {
+      const newImg = document.createElement("img");
+      const newX = document.createElement("img");
+      newImg.src = value.blob;
+      newImg.dataset.made = index.toString();
+      newImg.addEventListener("mouseenter", () => {
+        if (currentDown === null) changeX(index, "1");
+      });
+      newImg.addEventListener("mouseout", () => {
+        changeX(index, btnOpacityOff);
+      });
+      newImg.addEventListener("mousedown", (event) => {
+        currentDown = event.target as HTMLElement;
+      });
+      newImg.addEventListener("mousemove", (event) =>
+        moving(event as MouseEvent)
+      );
+
+      newX.src = "./x-btn.png";
+      newX.dataset.btnno = index.toString();
+      newX.classList.add("xBtn");
+      newX.addEventListener("click", () => killThumb(index));
+      newX.addEventListener("mouseenter", () => {
+        if (currentDown === null) changeX(index, "1");
+      });
+      newX.addEventListener("mouseout", () => {
+        changeX(index, btnOpacityOff);
+      });
+      thumbnailsContainer.appendChild(newX);
+      thumbnailsContainer.appendChild(newImg);
+    });
+    clearInput.disabled = false;
+    return;
+  }
+  clearInput.disabled = true;
 }
 
 function changeX(number, value) {
@@ -142,35 +151,37 @@ function changeX(number, value) {
   matchingX.style.opacity = value;
 }
 
-function killThumb(number) {
+function killThumb(number: number) {
+  if (number < 0 || number >= uploadedImages.length) return;
   uploadedImages.splice(number, 1);
-  document.getElementById("queueNum").innerHTML =
-    uploadedImages.length.toString();
+  if (numEl) numEl.innerHTML = uploadedImages.length.toString();
   imgNum = uploadedImages.length;
   changeMinPerImg(minPerImg);
   renderThumbs();
 }
 
 function changeImage(input: HTMLInputElement) {
-  if (input.files) {
-    imgNum += input.files.length;
-    //go through images
-    for (let i = 0; i < input.files.length; i++) {
-      let reader = new FileReader();
-      let fileName = input.files[i].name;
-      reader.onload = function (e) {
+  if (!input.files) return;
+  const newImages = Array.from(input.files);
+  if (newImages.length === 0) return;
+  imgNum += newImages.length;
+  newImages.forEach((file) => {
+    const reader = new FileReader();
+    const fileName = file.name;
+    reader.onload = function (e) {
+      if (e.target) {
         uploadedImages.push({
           name: fileName,
           blob: e.target.result as string,
         });
         renderThumbs();
-      };
-      reader.readAsDataURL(input.files[i]);
-    }
-    document.getElementById("queueNum").innerHTML = imgNum.toString();
-    changeMinPerImg(minPerImg);
-    input.value = "";
-  }
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  if (numEl) numEl.innerHTML = imgNum.toString();
+  changeMinPerImg(minPerImg);
+  input.value = "";
 }
 
 ///////////////
@@ -179,51 +190,53 @@ function changeImage(input: HTMLInputElement) {
 
 function startApp() {
   if (timeCalc > 0) {
+    // Remove event listeners
     window.removeEventListener("mousemove", moving);
     window.removeEventListener("mouseup", mouseUp);
+    if (!appElement) return;
 
-    //clear app
-    document.getElementById("app").innerHTML = "";
+    // Clear app content
+    appElement.innerHTML = "";
 
-    //create image element
-    let bigImg = document.createElement("img") as HTMLImageElement;
+    // Create and append the image element
+    const bigImg = document.createElement("img");
     bigImg.id = "galleryImg";
-    document.getElementById("app").appendChild(bigImg);
+    appElement.appendChild(bigImg);
 
-    //create timer element
-    let timer = document.createElement("span") as HTMLDivElement;
-    timer.innerHTML = new Date(minutes * 60 * 1000)
-      .toISOString()
-      .substr(14, 5)
-      .toString();
+    // Create and append the timer element
+    const timer = document.createElement("span");
     timer.id = "timer";
-    document.getElementById("app").appendChild(timer);
+    timer.textContent = new Date(minutes * 60 * 1000)
+      .toISOString()
+      .substr(14, 5);
+    appElement.appendChild(timer);
 
-    //create name element
-    let imgName = document.createElement("span") as HTMLDivElement;
+    // Create and append the image name element
+    const imgName = document.createElement("span");
     imgName.id = "imgName";
-    document.getElementById("app").appendChild(imgName);
+    appElement.appendChild(imgName);
 
-    //create count element
-    let count = document.createElement("span") as HTMLDivElement;
-    count.innerHTML = `${currentImg + 1}/${uploadedImages.length}`;
+    // Create and append the count element
+    const count = document.createElement("span");
     count.id = "theCount";
-    document.getElementById("app").appendChild(count);
+    count.textContent = `${currentImg + 1}/${uploadedImages.length}`;
+    appElement.appendChild(count);
 
-    //create skip button
-    let skipBtn = document.createElement("button") as HTMLButtonElement;
-    skipBtn.innerHTML = "skip";
-    skipBtn.addEventListener("click", skipImg);
+    // Create and append the skip button
+    const skipBtn = document.createElement("button");
     skipBtn.id = "skipBtn";
-    document.getElementById("app").appendChild(skipBtn);
+    skipBtn.textContent = "skip";
+    skipBtn.addEventListener("click", skipImg);
+    appElement.appendChild(skipBtn);
 
-    //create add 5 minutes button
-    let addFiveMin = document.createElement("button") as HTMLButtonElement;
-    addFiveMin.innerHTML = "pause timer";
-    addFiveMin.addEventListener("click", addFive);
+    // Create and append the pause timer button
+    const addFiveMin = document.createElement("button");
     addFiveMin.id = "addFive";
-    document.getElementById("app").appendChild(addFiveMin);
+    addFiveMin.textContent = "pause timer";
+    addFiveMin.addEventListener("click", addFive);
+    appElement.appendChild(addFiveMin);
 
+    // Load the next image
     nextImg();
   } else {
     if (imgNum < 1) {
@@ -261,63 +274,53 @@ function addFive() {
   }
 }
 
-function startTimer() {
-  let timer = document.getElementById("timer");
-  let seconds = minutes * 60;
-  let secondsDummy = seconds;
+function playAudio(audioId: string, volume: number) {
+  const audioElement = document.getElementById(audioId) as HTMLAudioElement;
+  if (audioElement) {
+    audioElement.volume = volume;
+    audioElement.play();
+  }
+}
 
-  //runs every second
+function startTimer() {
+  const timerElement = document.getElementById("timer") as HTMLElement;
+  const fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
+
+  if (!timerElement) return;
+
+  let secondsDummy = minutes * 60;
+
   function downTick() {
-    let fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
-    fiveBtn.disabled = false;
-    //if it's not skipped
-    if (skipped == false) {
-      //check if any minutes have been added
-      if (paused == true) {
+    if (!skipped) {
+      if (paused) {
         minutes = secondsDummy / 60;
         clearInterval(timeBomb);
       } else {
-        secondsDummy = secondsDummy - 1;
-        timer.innerHTML = new Date(secondsDummy * 1000)
+        secondsDummy--;
+        timerElement.innerHTML = new Date(secondsDummy * 1000)
           .toISOString()
-          .substr(14, 5)
-          .toString();
-
-        if (secondsDummy == 60) {
-          let minuteWarning = document.getElementById(
-            "oneMin"
-          ) as HTMLAudioElement;
-          minuteWarning.volume = musicVolume;
-          minuteWarning.play();
-        } else if (secondsDummy <= 3 && secondsDummy != 0) {
-          let tok = document.getElementById("tok") as HTMLAudioElement;
-          tok.volume = musicVolume;
-          tok.play();
-        }
+          .substr(14, 5);
+        if (secondsDummy === 60) playAudio("oneMin", musicVolume);
+        else if (secondsDummy <= 3 && secondsDummy !== 0)
+          playAudio("tok", musicVolume);
       }
-    }
-    //if skipped it triggered
-    else {
+    } else {
       skipped = false;
       explosion();
     }
-    if (secondsDummy == 0) {
-      explosion();
-    }
+
+    if (secondsDummy === 0) explosion();
   }
 
-  let timeBomb = setInterval(downTick, 1000);
+  const timeBomb = setInterval(downTick, 1000);
 
   function timerOut() {
-    if (currentImg + 1 != uploadedImages.length) {
-      timer.innerHTML = new Date(minutes * 60 * 1000)
+    if (currentImg + 1 !== uploadedImages.length) {
+      timerElement.innerHTML = new Date(minutes * 60 * 1000)
         .toISOString()
-        .substr(14, 5)
-        .toString();
+        .substr(14, 5);
       nextImg();
-    } else {
-      finish();
-    }
+    } else finish();
   }
 
   function explosion() {
@@ -328,14 +331,17 @@ function startTimer() {
 }
 
 function finish() {
-  let endScreen = document.createElement("div");
+  if (!appElement) return;
+  const endScreen = document.createElement("div");
   endScreen.id = "endScreen";
-  endScreen.innerHTML = "GOOD WARM-UP!";
-  document.getElementById("app").innerHTML = "";
-  document.getElementById("app").appendChild(endScreen);
-  let endMusic = document.getElementById("endMusic") as HTMLAudioElement;
-  endMusic.volume = musicVolume;
-  endMusic.play();
+  endScreen.textContent = "GOOD WARM-UP!";
+  appElement.innerHTML = "";
+  appElement.appendChild(endScreen);
+  const endMusic = document.getElementById("endMusic") as HTMLAudioElement;
+  if (endMusic) {
+    endMusic.volume = musicVolume;
+    endMusic.play();
+  }
 }
 
 function nextImg() {
