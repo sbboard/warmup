@@ -4,10 +4,10 @@ const minPerImg = document.querySelector("#minPerImg") as HTMLInputElement;
 const nextSFX = document.querySelector("#nextSFX") as HTMLAudioElement;
 const totalTimeElement = document.querySelector("#totalTime") as HTMLElement;
 const clearInput = document.querySelector("#clrQueue") as HTMLButtonElement;
+const startButton = document.querySelector("#startButton") as HTMLButtonElement;
 const numEl = document.querySelector("#queueNum");
 const thumbnailsContainer = document.querySelector("#thumbnails");
 
-let imgNum: number = 0;
 let uploadedImages: UploadImg[] = [];
 let minutes: number = 10;
 let minutesDupe: number = 10;
@@ -28,28 +28,31 @@ type UploadImg = {
 /////////////
 //////START UP
 ////////////
-function changeMinPerImg(input: HTMLInputElement) {
+function changeMinPerImg() {
+  console.log("changeMinPerImg");
   if (!totalTimeElement) return;
-  const inputValue = input.value.trim();
+  const inputValue = minPerImg.value.trim();
   const inputValueAsNumber = parseInt(inputValue, 10);
   if (inputValue.length === 0 || isNaN(inputValueAsNumber)) {
     totalTimeElement.innerHTML = "0";
     return;
   }
   const clampedValue = Math.min(Math.max(inputValueAsNumber, 1), 25);
-  input.value = clampedValue.toString();
+  minPerImg.value = clampedValue.toString();
   const minutes = clampedValue;
-  const timeCalc = imgNum * minutes;
+  timeCalc = uploadedImages.length * minutes;
   totalTimeElement.innerHTML = timeCalc.toString();
 }
 
+function updateTimeCalc() {}
+
 function clearQueue() {
-  if (numEl) numEl.innerHTML = "0";
   uploadedImages = [];
-  imgNum = 0;
+  if (numEl) numEl.innerHTML = uploadedImages.length.toString();
   clearInput.disabled = true;
+  startButton.disabled = true;
   if (thumbnailsContainer) thumbnailsContainer.innerHTML = "";
-  changeMinPerImg(minPerImg);
+  changeMinPerImg();
 }
 
 function changePauseEnd(input: HTMLInputElement) {
@@ -139,9 +142,13 @@ function renderThumbs() {
       thumbnailsContainer.appendChild(newImg);
     });
     clearInput.disabled = false;
+    startButton.disabled = false;
+    if (numEl) numEl.innerHTML = uploadedImages.length.toString();
+    changeMinPerImg();
     return;
   }
   clearInput.disabled = true;
+  startButton.disabled = true;
 }
 
 function changeX(number, value) {
@@ -155,8 +162,6 @@ function killThumb(number: number) {
   if (number < 0 || number >= uploadedImages.length) return;
   uploadedImages.splice(number, 1);
   if (numEl) numEl.innerHTML = uploadedImages.length.toString();
-  imgNum = uploadedImages.length;
-  changeMinPerImg(minPerImg);
   renderThumbs();
 }
 
@@ -164,7 +169,6 @@ function changeImage(input: HTMLInputElement) {
   if (!input.files) return;
   const newImages = Array.from(input.files);
   if (newImages.length === 0) return;
-  imgNum += newImages.length;
   newImages.forEach((file) => {
     const reader = new FileReader();
     const fileName = file.name;
@@ -179,8 +183,8 @@ function changeImage(input: HTMLInputElement) {
     };
     reader.readAsDataURL(file);
   });
-  if (numEl) numEl.innerHTML = imgNum.toString();
-  changeMinPerImg(minPerImg);
+  if (numEl) numEl.innerHTML = uploadedImages.length.toString();
+  changeMinPerImg();
   input.value = "";
 }
 
@@ -239,7 +243,7 @@ function startApp() {
     // Load the next image
     nextImg();
   } else {
-    if (imgNum < 1) {
+    if (uploadedImages.length < 1) {
       alert("Upload Images First");
     } else {
       alert("Timer set to 0");

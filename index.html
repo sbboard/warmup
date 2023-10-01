@@ -24,7 +24,7 @@
         <label for="minPerImg">minutes per image: </label
         ><input
           id="minPerImg"
-          onkeyup="changeMinPerImg(this)"
+          onchange="changeMinPerImg(this)"
           type="number"
           value="10"
           max="25"
@@ -39,7 +39,7 @@
         />
         <label for="pauseEnd">no timer on last image</label><br />
         total warm-up time: <span id="totalTime">0</span> minutes<br />
-        <button onclick="startApp()">Go</button>
+        <button id="startButton" onclick="startApp()" disabled>Go</button>
       </div>
     </div>
     <audio

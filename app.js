@@ -4,9 +4,9 @@ var minPerImg = document.querySelector("#minPerImg");
 var nextSFX = document.querySelector("#nextSFX");
 var totalTimeElement = document.querySelector("#totalTime");
 var clearInput = document.querySelector("#clrQueue");
+var startButton = document.querySelector("#startButton");
 var numEl = document.querySelector("#queueNum");
 var thumbnailsContainer = document.querySelector("#thumbnails");
-var imgNum = 0;
 var uploadedImages = [];
 var minutes = 10;
 var minutesDupe = 10;
@@ -18,30 +18,32 @@ var paused = false;
 var timeLeft = 0;
 var noTimerLast = false;
 var btnOpacityOff = 0;
-function changeMinPerImg(input) {
+function changeMinPerImg() {
+    console.log("changeMinPerImg");
     if (!totalTimeElement)
         return;
-    var inputValue = input.value.trim();
+    var inputValue = minPerImg.value.trim();
     var inputValueAsNumber = parseInt(inputValue, 10);
     if (inputValue.length === 0 || isNaN(inputValueAsNumber)) {
         totalTimeElement.innerHTML = "0";
         return;
     }
     var clampedValue = Math.min(Math.max(inputValueAsNumber, 1), 25);
-    input.value = clampedValue.toString();
+    minPerImg.value = clampedValue.toString();
     var minutes = clampedValue;
-    var timeCalc = imgNum * minutes;
+    timeCalc = uploadedImages.length * minutes;
     totalTimeElement.innerHTML = timeCalc.toString();
 }
+function updateTimeCalc() { }
 function clearQueue() {
-    if (numEl)
-        numEl.innerHTML = "0";
     uploadedImages = [];
-    imgNum = 0;
+    if (numEl)
+        numEl.innerHTML = uploadedImages.length.toString();
     clearInput.disabled = true;
+    startButton.disabled = true;
     if (thumbnailsContainer)
         thumbnailsContainer.innerHTML = "";
-    changeMinPerImg(minPerImg);
+    changeMinPerImg();
 }
 function changePauseEnd(input) {
     noTimerLast = input.checked;
@@ -126,9 +128,14 @@ function renderThumbs() {
             thumbnailsContainer.appendChild(newImg);
         });
         clearInput.disabled = false;
+        startButton.disabled = false;
+        if (numEl)
+            numEl.innerHTML = uploadedImages.length.toString();
+        changeMinPerImg();
         return;
     }
     clearInput.disabled = true;
+    startButton.disabled = true;
 }
 function changeX(number, value) {
     var matchingX = document.querySelectorAll("[data-btnno=\"".concat(number.toString(), "\"]"))[0];
@@ -140,8 +147,6 @@ function killThumb(number) {
     uploadedImages.splice(number, 1);
     if (numEl)
         numEl.innerHTML = uploadedImages.length.toString();
-    imgNum = uploadedImages.length;
-    changeMinPerImg(minPerImg);
     renderThumbs();
 }
 function changeImage(input) {
@@ -150,7 +155,6 @@ function changeImage(input) {
     var newImages = Array.from(input.files);
     if (newImages.length === 0)
         return;
-    imgNum += newImages.length;
     newImages.forEach(function (file) {
         var reader = new FileReader();
         var fileName = file.name;
@@ -166,8 +170,8 @@ function changeImage(input) {
         reader.readAsDataURL(file);
     });
     if (numEl)
-        numEl.innerHTML = imgNum.toString();
-    changeMinPerImg(minPerImg);
+        numEl.innerHTML = uploadedImages.length.toString();
+    changeMinPerImg();
     input.value = "";
 }
 function startApp() {
@@ -206,7 +210,7 @@ function startApp() {
         nextImg();
     }
     else {
-        if (imgNum < 1) {
+        if (uploadedImages.length < 1) {
             alert("Upload Images First");
         }
         else {
