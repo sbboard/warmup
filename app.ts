@@ -29,7 +29,6 @@ type UploadImg = {
 //////START UP
 ////////////
 function changeMinPerImg() {
-  console.log("changeMinPerImg");
   if (!totalTimeElement) return;
   const inputValue = minPerImg.value.trim();
   const inputValueAsNumber = parseInt(inputValue, 10);
@@ -111,8 +110,10 @@ function renderThumbs() {
   thumbnailsContainer.innerHTML = "";
   if (uploadedImages.length > 0) {
     uploadedImages.forEach((value: UploadImg, index) => {
+      const thumbWrap = document.createElement("div");
       const newImg = document.createElement("img");
       const newX = document.createElement("img");
+      const nameEl = document.createElement("span");
       newImg.src = value.blob;
       newImg.dataset.made = index.toString();
       newImg.addEventListener("mouseenter", () => {
@@ -138,8 +139,14 @@ function renderThumbs() {
       newX.addEventListener("mouseout", () => {
         changeX(index, btnOpacityOff);
       });
-      thumbnailsContainer.appendChild(newX);
-      thumbnailsContainer.appendChild(newImg);
+
+      nameEl.innerHTML = value.name;
+      nameEl.classList.add("thumbName");
+
+      thumbWrap.appendChild(newX);
+      thumbWrap.appendChild(nameEl);
+      thumbWrap.appendChild(newImg);
+      thumbnailsContainer.appendChild(thumbWrap);
     });
     clearInput.disabled = false;
     startButton.disabled = false;
@@ -169,7 +176,40 @@ function changeImage(input: HTMLInputElement) {
   if (!input.files) return;
   const newImages = Array.from(input.files);
   if (newImages.length === 0) return;
-  newImages.forEach((file) => {
+  renderImages(newImages);
+  input.value = "";
+}
+
+function getRandomEntriesFromArray<T>(arr: T[], targetLength: number): T[] {
+  if (targetLength >= arr.length) return arr;
+  const result: T[] = [...arr]; // Clone the original array to avoid modifying it.
+  while (result.length > targetLength) {
+    const randomIndex = Math.floor(Math.random() * result.length);
+    result.splice(randomIndex, 1); // Remove the random element from the array.
+  }
+  return result;
+}
+
+function chooseImage(input: HTMLInputElement) {
+  clearQueue();
+  const chooseNumEl = document.querySelector("#chooseNum") as HTMLInputElement;
+  if (!input.files) return;
+  const newImages = Array.from(input.files);
+  if (newImages.length === 0) return;
+  if (input.files.length < Number.parseFloat(chooseNumEl.value)) {
+    alert("Not enough files selected");
+    return;
+  }
+  const randomImages = getRandomEntriesFromArray(
+    newImages,
+    Number.parseFloat(chooseNumEl.value)
+  );
+  renderImages(randomImages);
+  input.value = "";
+}
+
+function renderImages(images: File[]) {
+  images.forEach((file) => {
     const reader = new FileReader();
     const fileName = file.name;
     reader.onload = function (e) {
@@ -185,7 +225,6 @@ function changeImage(input: HTMLInputElement) {
   });
   if (numEl) numEl.innerHTML = uploadedImages.length.toString();
   changeMinPerImg();
-  input.value = "";
 }
 
 ///////////////

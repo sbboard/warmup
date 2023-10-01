@@ -56,19 +56,34 @@ input {
   overflow-y: hidden;
   position: relative;
 }
-#thumbnails img {
+#thumbnails > div {
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+  margin-right: 0.5em;
+  height: 200px;
+}
+#thumbnails > div .thumbName {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  text-overflow: ellipsis;
+  bottom: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+#thumbnails > div img {
   height: 200px;
   width: auto;
-  margin-right: 0.5em;
   transition: width 0.1s, max-height 0.1s, height 0.1s;
   cursor: move;
 }
-#thumbnails img.dragged {
+#thumbnails > div img.dragged {
   max-height: 50px;
   width: auto;
   position: absolute;
 }
-#thumbnails img.xBtn {
+#thumbnails > div img.xBtn {
   position: absolute;
   cursor: pointer;
   opacity: 0;

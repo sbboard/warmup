@@ -1,3 +1,12 @@
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var appElement = document.querySelector("#app");
 var fileTag = document.querySelector("#filetag");
 var minPerImg = document.querySelector("#minPerImg");
@@ -19,7 +28,6 @@ var timeLeft = 0;
 var noTimerLast = false;
 var btnOpacityOff = 0;
 function changeMinPerImg() {
-    console.log("changeMinPerImg");
     if (!totalTimeElement)
         return;
     var inputValue = minPerImg.value.trim();
@@ -96,8 +104,10 @@ function renderThumbs() {
     thumbnailsContainer.innerHTML = "";
     if (uploadedImages.length > 0) {
         uploadedImages.forEach(function (value, index) {
+            var thumbWrap = document.createElement("div");
             var newImg = document.createElement("img");
             var newX = document.createElement("img");
+            var nameEl = document.createElement("span");
             newImg.src = value.blob;
             newImg.dataset.made = index.toString();
             newImg.addEventListener("mouseenter", function () {
@@ -124,8 +134,12 @@ function renderThumbs() {
             newX.addEventListener("mouseout", function () {
                 changeX(index, btnOpacityOff);
             });
-            thumbnailsContainer.appendChild(newX);
-            thumbnailsContainer.appendChild(newImg);
+            nameEl.innerHTML = value.name;
+            nameEl.classList.add("thumbName");
+            thumbWrap.appendChild(newX);
+            thumbWrap.appendChild(nameEl);
+            thumbWrap.appendChild(newImg);
+            thumbnailsContainer.appendChild(thumbWrap);
         });
         clearInput.disabled = false;
         startButton.disabled = false;
@@ -155,7 +169,37 @@ function changeImage(input) {
     var newImages = Array.from(input.files);
     if (newImages.length === 0)
         return;
-    newImages.forEach(function (file) {
+    renderImages(newImages);
+    input.value = "";
+}
+function getRandomEntriesFromArray(arr, targetLength) {
+    if (targetLength >= arr.length)
+        return arr;
+    var result = __spreadArray([], arr, true);
+    while (result.length > targetLength) {
+        var randomIndex = Math.floor(Math.random() * result.length);
+        result.splice(randomIndex, 1);
+    }
+    return result;
+}
+function chooseImage(input) {
+    clearQueue();
+    var chooseNumEl = document.querySelector("#chooseNum");
+    if (!input.files)
+        return;
+    var newImages = Array.from(input.files);
+    if (newImages.length === 0)
+        return;
+    if (input.files.length < Number.parseFloat(chooseNumEl.value)) {
+        alert("Not enough files selected");
+        return;
+    }
+    var randomImages = getRandomEntriesFromArray(newImages, Number.parseFloat(chooseNumEl.value));
+    renderImages(randomImages);
+    input.value = "";
+}
+function renderImages(images) {
+    images.forEach(function (file) {
         var reader = new FileReader();
         var fileName = file.name;
         reader.onload = function (e) {
@@ -172,7 +216,6 @@ function changeImage(input) {
     if (numEl)
         numEl.innerHTML = uploadedImages.length.toString();
     changeMinPerImg();
-    input.value = "";
 }
 function startApp() {
     if (timeCalc > 0) {
@@ -208,14 +251,6 @@ function startApp() {
         addFiveMin.addEventListener("click", addFive);
         appElement.appendChild(addFiveMin);
         nextImg();
-    }
-    else {
-        if (uploadedImages.length < 1) {
-            alert("Upload Images First");
-        }
-        else {
-            alert("Timer set to 0");
-        }
     }
 }
 var skipped = false;
