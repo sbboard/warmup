@@ -66,12 +66,12 @@ window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
 
 function moving(e: MouseEvent) {
-  if (currentDown === null) return;
+  if (!currentDown || !currentDown.parentElement) return;
+  const { parentElement } = currentDown;
   e.preventDefault();
-  currentDown.classList.add("dragged");
-  changeX(currentDown.dataset.made, btnOpacityOff);
-  currentDown.style.left = `${e.clientX - 10}px`;
-  currentDown.style.top = `${e.clientY - 10}px`;
+  parentElement.classList.add("dragged");
+  parentElement.style.left = `${e.clientX - 10}px`;
+  parentElement.style.top = `${e.clientY - 75}px`;
 }
 
 function arraymove(arr, fromIndex, toIndex) {
@@ -116,12 +116,6 @@ function renderThumbs() {
       const nameEl = document.createElement("span");
       newImg.src = value.blob;
       newImg.dataset.made = index.toString();
-      newImg.addEventListener("mouseenter", () => {
-        if (currentDown === null) changeX(index, "1");
-      });
-      newImg.addEventListener("mouseout", () => {
-        changeX(index, btnOpacityOff);
-      });
       newImg.addEventListener("mousedown", (event) => {
         currentDown = event.target as HTMLElement;
       });
@@ -133,12 +127,6 @@ function renderThumbs() {
       newX.dataset.btnno = index.toString();
       newX.classList.add("xBtn");
       newX.addEventListener("click", () => killThumb(index));
-      newX.addEventListener("mouseenter", () => {
-        if (currentDown === null) changeX(index, "1");
-      });
-      newX.addEventListener("mouseout", () => {
-        changeX(index, btnOpacityOff);
-      });
 
       nameEl.innerHTML = value.name;
       nameEl.classList.add("thumbName");
@@ -156,13 +144,6 @@ function renderThumbs() {
   }
   clearInput.disabled = true;
   startButton.disabled = true;
-}
-
-function changeX(number, value) {
-  let matchingX = document.querySelectorAll(
-    `[data-btnno="${number.toString()}"]`
-  )[0] as HTMLImageElement;
-  matchingX.style.opacity = value;
 }
 
 function killThumb(number: number) {
