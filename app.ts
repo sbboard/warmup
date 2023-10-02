@@ -65,13 +65,18 @@ let currentDown: HTMLElement | null = null;
 window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
 
+let startingPosition: number | null = null;
+
 function moving(e: MouseEvent) {
-  if (currentDown === null) return;
+  if (!currentDown || !currentDown.parentElement) return;
+  const { parentElement } = currentDown;
   e.preventDefault();
-  currentDown.classList.add("dragged");
-  changeX(currentDown.dataset.made, btnOpacityOff);
-  currentDown.style.left = `${e.clientX - 10}px`;
-  currentDown.style.top = `${e.clientY - 10}px`;
+  if (!startingPosition) startingPosition = e.clientX;
+  if (Math.abs(e.clientX - startingPosition) > 10) {
+    parentElement.classList.add("dragged");
+    parentElement.style.left = `${e.clientX - 10}px`;
+    parentElement.style.top = `${e.clientY - 75}px`;
+  }
 }
 
 function arraymove(arr, fromIndex, toIndex) {
@@ -81,26 +86,33 @@ function arraymove(arr, fromIndex, toIndex) {
 }
 
 function mouseUp(event: MouseEvent) {
-  if (currentDown === null) return;
+  if (!currentDown || !currentDown.parentElement) return;
   const currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
-  currentDown.classList.remove("dragged");
+  currentDown.parentElement.classList.remove("dragged");
+  currentDown.parentElement.style.left = `0px`;
+  currentDown.parentElement.style.top = `0px`;
   currentDown = null;
+  if (!startingPosition) return;
+  const startingPosCopy = startingPosition || 0;
+  startingPosition = null;
   const clientX = event.clientX;
-  for (let i = 0; i < uploadedImages.length; i++) {
-    if (i !== currentDownNum) {
-      const currentElm = document.querySelector(`[data-made="${i}"]`);
-      if (currentElm) {
-        const elmBox = currentElm.getBoundingClientRect();
-        if (elmBox.right > clientX) {
-          arraymove(uploadedImages, currentDownNum, i);
-          renderThumbs();
-          break;
+  if (Math.abs(clientX - startingPosCopy) > 50) {
+    for (let i = 0; i < uploadedImages.length; i++) {
+      if (i !== currentDownNum) {
+        const currentElm = document.querySelector(`[data-made="${i}"]`);
+        if (currentElm) {
+          const elmBox = currentElm.getBoundingClientRect();
+          if (elmBox.right > clientX) {
+            arraymove(uploadedImages, currentDownNum, i);
+            renderThumbs();
+            break;
+          }
         }
       }
-    }
-    if (i === uploadedImages.length - 1) {
-      arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
-      renderThumbs();
+      if (i === uploadedImages.length - 1) {
+        arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
+        renderThumbs();
+      }
     }
   }
 }
@@ -116,12 +128,6 @@ function renderThumbs() {
       const nameEl = document.createElement("span");
       newImg.src = value.blob;
       newImg.dataset.made = index.toString();
-      newImg.addEventListener("mouseenter", () => {
-        if (currentDown === null) changeX(index, "1");
-      });
-      newImg.addEventListener("mouseout", () => {
-        changeX(index, btnOpacityOff);
-      });
       newImg.addEventListener("mousedown", (event) => {
         currentDown = event.target as HTMLElement;
       });
@@ -133,12 +139,6 @@ function renderThumbs() {
       newX.dataset.btnno = index.toString();
       newX.classList.add("xBtn");
       newX.addEventListener("click", () => killThumb(index));
-      newX.addEventListener("mouseenter", () => {
-        if (currentDown === null) changeX(index, "1");
-      });
-      newX.addEventListener("mouseout", () => {
-        changeX(index, btnOpacityOff);
-      });
 
       nameEl.innerHTML = value.name;
       nameEl.classList.add("thumbName");
@@ -156,13 +156,6 @@ function renderThumbs() {
   }
   clearInput.disabled = true;
   startButton.disabled = true;
-}
-
-function changeX(number, value) {
-  let matchingX = document.querySelectorAll(
-    `[data-btnno="${number.toString()}"]`
-  )[0] as HTMLImageElement;
-  matchingX.style.opacity = value;
 }
 
 function killThumb(number: number) {

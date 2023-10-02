@@ -60,17 +60,26 @@ table
         img
             height: 200px
             width: auto
-            transition: width .1s, max-height .1s, height .1s
             cursor: move
-        img.dragged
-            max-height: 50px
-            width: auto
-            position: absolute
         img.xBtn
             position: absolute
             cursor: pointer
             opacity: 0
             height: initial
+        &:hover img.xBtn
+            opacity: 1
+        &.dragged
+            position: absolute
+            z-index: 900
+            img
+                height: 100px
+                width: auto
+                margin-bottom: auto
+                margin-top: 0
+                &.xBtn
+                    opacity: 0
+            .thumbName
+                display: none
 #galleryImg
     object-fit: contain
     width: 100vw
