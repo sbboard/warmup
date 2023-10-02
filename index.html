@@ -34,27 +34,55 @@
         <div id="thumbnails"></div>
         images in queue: <span id="queueNum">0</span>
         <button id="clrQueue" onclick="clearQueue()" disabled>
-          clear queue</button
-        ><br />
-        <label for="minPerImg">minutes per image: </label
-        ><input
-          id="minPerImg"
-          onchange="changeMinPerImg(this)"
-          type="number"
-          value="10"
-          max="25"
-          min="1"
-        /><br />
-        <input
-          onchange="changePauseEnd(this)"
-          type="checkbox"
-          id="pauseEnd"
-          name="pauseEnd"
-          value="pauseEnd"
-        />
-        <label for="pauseEnd">no timer on last image</label><br />
-        total warm-up time: <span id="totalTime">0</span> minutes<br />
-        <button id="startButton" onclick="startApp()" disabled>Go</button>
+          clear queue
+        </button>
+        <div id="timerSettings">
+          <h4>Timer Settings</h4>
+          <label for="minPerImg">Minutes Per Image: </label
+          ><input
+            id="minPerImg"
+            onchange="changeMinPerImg(this)"
+            type="number"
+            value="10"
+            max="25"
+            min="1"
+          /><br />
+          <div>
+            <input
+              type="radio"
+              id="timerAlwaysOn"
+              name="timerOption"
+              value="TimerAlwaysOn"
+              onchange="changePauseEnd(this)"
+              checked
+            />
+            <label for="timerAlwaysOn">On</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="timerAlwaysOff"
+              name="timerOption"
+              value="TimerAlwaysOff"
+              onchange="changePauseEnd(this)"
+            />
+            <label for="timerAlwaysOff">Off</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="noTimerOnLastImage"
+              name="timerOption"
+              value="NoTimerOnLastImage"
+              onchange="changePauseEnd(this)"
+            />
+            <label for="noTimerOnLastImage">Off On Last Image</label>
+          </div>
+        </div>
+        Est Warm-Up Time: <span id="totalTime">0</span> Minutes<br />
+        <button id="startButton" onclick="startApp()" disabled>
+          Start Warm-Up
+        </button>
       </div>
     </div>
     <audio
