@@ -65,13 +65,18 @@ let currentDown: HTMLElement | null = null;
 window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
 
+let startingPosition: number | null = null;
+
 function moving(e: MouseEvent) {
   if (!currentDown || !currentDown.parentElement) return;
   const { parentElement } = currentDown;
   e.preventDefault();
-  parentElement.classList.add("dragged");
-  parentElement.style.left = `${e.clientX - 10}px`;
-  parentElement.style.top = `${e.clientY - 75}px`;
+  if (!startingPosition) startingPosition = e.clientX;
+  if (Math.abs(e.clientX - startingPosition) > 10) {
+    parentElement.classList.add("dragged");
+    parentElement.style.left = `${e.clientX - 10}px`;
+    parentElement.style.top = `${e.clientY - 75}px`;
+  }
 }
 
 function arraymove(arr, fromIndex, toIndex) {
@@ -81,26 +86,33 @@ function arraymove(arr, fromIndex, toIndex) {
 }
 
 function mouseUp(event: MouseEvent) {
-  if (currentDown === null) return;
+  if (!currentDown || !currentDown.parentElement) return;
   const currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
-  currentDown.classList.remove("dragged");
+  currentDown.parentElement.classList.remove("dragged");
+  currentDown.parentElement.style.left = `0px`;
+  currentDown.parentElement.style.top = `0px`;
   currentDown = null;
+  if (!startingPosition) return;
+  const startingPosCopy = startingPosition || 0;
+  startingPosition = null;
   const clientX = event.clientX;
-  for (let i = 0; i < uploadedImages.length; i++) {
-    if (i !== currentDownNum) {
-      const currentElm = document.querySelector(`[data-made="${i}"]`);
-      if (currentElm) {
-        const elmBox = currentElm.getBoundingClientRect();
-        if (elmBox.right > clientX) {
-          arraymove(uploadedImages, currentDownNum, i);
-          renderThumbs();
-          break;
+  if (Math.abs(clientX - startingPosCopy) > 50) {
+    for (let i = 0; i < uploadedImages.length; i++) {
+      if (i !== currentDownNum) {
+        const currentElm = document.querySelector(`[data-made="${i}"]`);
+        if (currentElm) {
+          const elmBox = currentElm.getBoundingClientRect();
+          if (elmBox.right > clientX) {
+            arraymove(uploadedImages, currentDownNum, i);
+            renderThumbs();
+            break;
+          }
         }
       }
-    }
-    if (i === uploadedImages.length - 1) {
-      arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
-      renderThumbs();
+      if (i === uploadedImages.length - 1) {
+        arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
+        renderThumbs();
+      }
     }
   }
 }
