@@ -1,3 +1,10 @@
+type UploadImg = {
+  name: string;
+  blob: string;
+};
+
+type TimerSetting = "TimerAlwaysOff" | "TimerAlwaysOn" | "NoTimerOnLastImage";
+
 const appElement = document.querySelector("#app");
 const fileTag = document.querySelector("#filetag") as HTMLInputElement;
 const minPerImg = document.querySelector("#minPerImg") as HTMLInputElement;
@@ -17,13 +24,8 @@ const musicVolume = 0.2;
 nextSFX.volume = musicVolume;
 let paused: boolean = false;
 let timeLeft: number = 0;
-let noTimerLast: boolean = false;
+let timerSetting: TimerSetting = "TimerAlwaysOn";
 const btnOpacityOff: number = 0;
-
-type UploadImg = {
-  name: string;
-  blob: string;
-};
 
 /////////////
 //////START UP
@@ -55,7 +57,7 @@ function clearQueue() {
 }
 
 function changePauseEnd(input: HTMLInputElement) {
-  noTimerLast = input.checked;
+  timerSetting = input.value as TimerSetting;
 }
 
 let currentDown: HTMLElement | null = null;
@@ -271,7 +273,7 @@ function startApp() {
   const skipBtn = document.createElement("button");
   skipBtn.id = "skipBtn";
   skipBtn.textContent = copy.skip;
-  skipBtn.addEventListener("click", () => (skipped = true));
+  skipBtn.addEventListener("click", resetTimer);
   appElement.appendChild(skipBtn);
 
   // Create and append the pause timer button
@@ -288,16 +290,10 @@ function startApp() {
 ////////////////////
 ////RUNNING
 ///////////////////
-
-let skipped: boolean = false;
-
 function pause() {
   const pauseBtn = document.getElementById("pause") as HTMLButtonElement;
-  const skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
   paused = !paused;
   pauseBtn.innerHTML = !paused ? copy.pause : copy.start;
-  skipBtn.disabled = paused;
-  if (!paused) startTimer();
 }
 
 function playAudio(audioId: string, volume: number) {
@@ -307,44 +303,39 @@ function playAudio(audioId: string, volume: number) {
   audioElement.play();
 }
 
+let timer: ReturnType<typeof setInterval>;
+
 function startTimer() {
   const timerElement = document.getElementById("timer") as HTMLElement;
   if (!timerElement) return;
   let secondsDummy = minutes * 60;
   function downTick() {
-    if (!skipped) {
-      if (paused) {
-        minutes = secondsDummy / 60;
-        clearInterval(timeBomb);
-      } else {
-        secondsDummy--;
-        timerElement.innerHTML = new Date(secondsDummy * 1000)
-          .toISOString()
-          .substr(14, 5);
-        if (secondsDummy === 60) playAudio("oneMin", musicVolume);
-        else if (secondsDummy <= 3 && secondsDummy !== 0)
-          playAudio("tok", musicVolume);
-      }
-    } else {
-      skipped = false;
-      explosion();
-    }
-    if (secondsDummy === 0) explosion();
-  }
-  const timeBomb = setInterval(downTick, 1000);
-  function timerOut() {
-    if (currentImg + 1 !== uploadedImages.length) {
-      timerElement.innerHTML = new Date(minutes * 60 * 1000)
+    if (!paused) {
+      secondsDummy--;
+      timerElement.innerHTML = new Date(secondsDummy * 1000)
         .toISOString()
         .substr(14, 5);
-      nextImg();
-    } else finish();
+      if (secondsDummy === 60) {
+        playAudio("oneMin", musicVolume); //minute warning sfx
+      } else if (secondsDummy <= 3 && secondsDummy !== 0) {
+        playAudio("tok", musicVolume); // final 3 seconds sfx
+      } else if (secondsDummy === 0) {
+        if (currentImg + 1 !== uploadedImages.length) resetTimer();
+        else finish();
+      }
+    }
   }
-  function explosion() {
-    minutes = minutesDupe;
-    clearInterval(timeBomb);
-    timerOut();
-  }
+  timer = setInterval(downTick, 1000);
+}
+
+function resetTimer() {
+  const timerElement = document.getElementById("timer") as HTMLElement;
+  minutes = minutesDupe;
+  clearInterval(timer);
+  timerElement.innerHTML = new Date(minutes * 60 * 1000)
+    .toISOString()
+    .substr(14, 5);
+  nextImg();
 }
 
 function finish() {
@@ -362,19 +353,25 @@ function finish() {
 
 function nextImg() {
   currentImg++;
-  const count = document.getElementById("theCount") as HTMLSpanElement;
+  const { length: imgLength } = uploadedImages;
   const skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
   const theNowImg: UploadImg = uploadedImages[currentImg];
-  count.innerHTML = `${currentImg + 1}/${uploadedImages.length}`;
+  const count = document.getElementById("theCount") as HTMLSpanElement;
+  count.innerHTML = `${currentImg + 1}/${imgLength}`;
   const gallery = document.getElementById("galleryImg") as HTMLImageElement;
   const imgName = document.getElementById("imgName") as HTMLImageElement;
   gallery.src = theNowImg.blob;
   imgName.innerHTML = theNowImg.name;
   nextSFX.play();
-  if (currentImg + 1 == uploadedImages.length) skipBtn.innerHTML = copy.finish;
-  if (noTimerLast === true && currentImg + 1 == uploadedImages.length) {
-    skipBtn.removeEventListener("click", () => (skipped = true));
+  if (currentImg + 1 == imgLength) {
+    skipBtn.innerHTML = copy.finish;
+    skipBtn.removeEventListener("click", resetTimer);
     skipBtn.addEventListener("click", finish);
+  }
+  if (
+    (timerSetting === "NoTimerOnLastImage" && currentImg + 1 == imgLength) ||
+    timerSetting === "TimerAlwaysOff"
+  ) {
     const pauseBtn = document.getElementById("pause") as HTMLButtonElement;
     pauseBtn.disabled = true;
   } else {
