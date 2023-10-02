@@ -64,13 +64,12 @@ window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
 
 function moving(e: MouseEvent) {
-  if (currentDown != null) {
-    e.preventDefault();
-    currentDown.classList.add("dragged");
-    changeX(currentDown.dataset.made, btnOpacityOff);
-    currentDown.style.left = `${e.clientX - 10}px`;
-    currentDown.style.top = `${e.clientY - 10}px`;
-  }
+  if (currentDown === null) return;
+  e.preventDefault();
+  currentDown.classList.add("dragged");
+  changeX(currentDown.dataset.made, btnOpacityOff);
+  currentDown.style.left = `${e.clientX - 10}px`;
+  currentDown.style.top = `${e.clientY - 10}px`;
 }
 
 function arraymove(arr, fromIndex, toIndex) {
@@ -80,27 +79,26 @@ function arraymove(arr, fromIndex, toIndex) {
 }
 
 function mouseUp(event: MouseEvent) {
-  if (currentDown !== null) {
-    const currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
-    currentDown.classList.remove("dragged");
-    currentDown = null;
-    const clientX = event.clientX;
-    for (let i = 0; i < uploadedImages.length; i++) {
-      if (i !== currentDownNum) {
-        const currentElm = document.querySelector(`[data-made="${i}"]`);
-        if (currentElm) {
-          const elmBox = currentElm.getBoundingClientRect();
-          if (elmBox.right > clientX) {
-            arraymove(uploadedImages, currentDownNum, i);
-            renderThumbs();
-            break;
-          }
+  if (currentDown === null) return;
+  const currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
+  currentDown.classList.remove("dragged");
+  currentDown = null;
+  const clientX = event.clientX;
+  for (let i = 0; i < uploadedImages.length; i++) {
+    if (i !== currentDownNum) {
+      const currentElm = document.querySelector(`[data-made="${i}"]`);
+      if (currentElm) {
+        const elmBox = currentElm.getBoundingClientRect();
+        if (elmBox.right > clientX) {
+          arraymove(uploadedImages, currentDownNum, i);
+          renderThumbs();
+          break;
         }
       }
-      if (i === uploadedImages.length - 1) {
-        arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
-        renderThumbs();
-      }
+    }
+    if (i === uploadedImages.length - 1) {
+      arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
+      renderThumbs();
     }
   }
 }
@@ -230,58 +228,61 @@ function renderImages(images: File[]) {
 ///////////////
 //////PRESS START
 //////////////
+const copy = {
+  pause: "Pause Timer",
+  start: "Start Timer",
+  skip: "Skip",
+  finish: "Finish",
+};
 
 function startApp() {
-  if (timeCalc > 0) {
-    // Remove event listeners
-    window.removeEventListener("mousemove", moving);
-    window.removeEventListener("mouseup", mouseUp);
-    if (!appElement) return;
+  if (timeCalc <= 0) return;
+  // Remove event listeners
+  window.removeEventListener("mousemove", moving);
+  window.removeEventListener("mouseup", mouseUp);
+  if (!appElement) return;
 
-    // Clear app content
-    appElement.innerHTML = "";
+  // Clear app content
+  appElement.innerHTML = "";
 
-    // Create and append the image element
-    const bigImg = document.createElement("img");
-    bigImg.id = "galleryImg";
-    appElement.appendChild(bigImg);
+  // Create and append the image element
+  const bigImg = document.createElement("img");
+  bigImg.id = "galleryImg";
+  appElement.appendChild(bigImg);
 
-    // Create and append the timer element
-    const timer = document.createElement("span");
-    timer.id = "timer";
-    timer.textContent = new Date(minutes * 60 * 1000)
-      .toISOString()
-      .substr(14, 5);
-    appElement.appendChild(timer);
+  // Create and append the timer element
+  const timer = document.createElement("span");
+  timer.id = "timer";
+  timer.textContent = new Date(minutes * 60 * 1000).toISOString().substr(14, 5);
+  appElement.appendChild(timer);
 
-    // Create and append the image name element
-    const imgName = document.createElement("span");
-    imgName.id = "imgName";
-    appElement.appendChild(imgName);
+  // Create and append the image name element
+  const imgName = document.createElement("span");
+  imgName.id = "imgName";
+  appElement.appendChild(imgName);
 
-    // Create and append the count element
-    const count = document.createElement("span");
-    count.id = "theCount";
-    count.textContent = `${currentImg + 1}/${uploadedImages.length}`;
-    appElement.appendChild(count);
+  // Create and append the count element
+  const count = document.createElement("span");
+  count.id = "theCount";
+  count.textContent = `${currentImg + 1}/${uploadedImages.length}`;
+  appElement.appendChild(count);
 
-    // Create and append the skip button
-    const skipBtn = document.createElement("button");
-    skipBtn.id = "skipBtn";
-    skipBtn.textContent = "skip";
-    skipBtn.addEventListener("click", skipImg);
-    appElement.appendChild(skipBtn);
+  // Create and append the skip button
+  const skipBtn = document.createElement("button");
+  skipBtn.id = "skipBtn";
+  skipBtn.textContent = copy.skip;
+  skipBtn.addEventListener("click", () => (skipped = true));
+  appElement.appendChild(skipBtn);
 
-    // Create and append the pause timer button
-    const addFiveMin = document.createElement("button");
-    addFiveMin.id = "addFive";
-    addFiveMin.textContent = "pause timer";
-    addFiveMin.addEventListener("click", addFive);
-    appElement.appendChild(addFiveMin);
+  // Create and append the pause timer button
+  const timerPause = document.createElement("button");
+  timerPause.id = "pause";
+  timerPause.textContent = copy.pause;
+  timerPause.addEventListener("click", pause);
+  appElement.appendChild(timerPause);
 
-    // Load the next image
-    nextImg();
-  }
+  // Load the next image
+  nextImg();
 }
 
 ////////////////////
@@ -290,43 +291,26 @@ function startApp() {
 
 let skipped: boolean = false;
 
-function skipImg() {
-  skipped = true;
-}
-
-function addFive() {
-  let fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
-  let skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
-  if (paused == false) {
-    paused = true;
-    fiveBtn.innerHTML = "start timer";
-    fiveBtn.disabled = true;
-    skipBtn.disabled = true;
-  } else {
-    startTimer();
-    paused = false;
-    fiveBtn.innerHTML = "pause timer";
-    fiveBtn.disabled = true;
-    skipBtn.disabled = false;
-  }
+function pause() {
+  const pauseBtn = document.getElementById("pause") as HTMLButtonElement;
+  const skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
+  paused = !paused;
+  pauseBtn.innerHTML = !paused ? copy.pause : copy.start;
+  skipBtn.disabled = paused;
+  if (!paused) startTimer();
 }
 
 function playAudio(audioId: string, volume: number) {
   const audioElement = document.getElementById(audioId) as HTMLAudioElement;
-  if (audioElement) {
-    audioElement.volume = volume;
-    audioElement.play();
-  }
+  if (!audioElement) return;
+  audioElement.volume = volume;
+  audioElement.play();
 }
 
 function startTimer() {
   const timerElement = document.getElementById("timer") as HTMLElement;
-  const fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
-
   if (!timerElement) return;
-
   let secondsDummy = minutes * 60;
-
   function downTick() {
     if (!skipped) {
       if (paused) {
@@ -345,12 +329,9 @@ function startTimer() {
       skipped = false;
       explosion();
     }
-
     if (secondsDummy === 0) explosion();
   }
-
   const timeBomb = setInterval(downTick, 1000);
-
   function timerOut() {
     if (currentImg + 1 !== uploadedImages.length) {
       timerElement.innerHTML = new Date(minutes * 60 * 1000)
@@ -359,7 +340,6 @@ function startTimer() {
       nextImg();
     } else finish();
   }
-
   function explosion() {
     minutes = minutesDupe;
     clearInterval(timeBomb);
@@ -375,33 +355,28 @@ function finish() {
   appElement.innerHTML = "";
   appElement.appendChild(endScreen);
   const endMusic = document.getElementById("endMusic") as HTMLAudioElement;
-  if (endMusic) {
-    endMusic.volume = musicVolume;
-    endMusic.play();
-  }
+  if (!endMusic) return;
+  endMusic.volume = musicVolume;
+  endMusic.play();
 }
 
 function nextImg() {
   currentImg++;
-
-  let count = document.getElementById("theCount") as HTMLSpanElement;
-  let skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
-  let theNowImg: UploadImg = uploadedImages[currentImg];
+  const count = document.getElementById("theCount") as HTMLSpanElement;
+  const skipBtn = document.getElementById("skipBtn") as HTMLButtonElement;
+  const theNowImg: UploadImg = uploadedImages[currentImg];
   count.innerHTML = `${currentImg + 1}/${uploadedImages.length}`;
-
-  let gallery = document.getElementById("galleryImg") as HTMLImageElement;
-  let imgName = document.getElementById("imgName") as HTMLImageElement;
+  const gallery = document.getElementById("galleryImg") as HTMLImageElement;
+  const imgName = document.getElementById("imgName") as HTMLImageElement;
   gallery.src = theNowImg.blob;
   imgName.innerHTML = theNowImg.name;
   nextSFX.play();
-  if (currentImg + 1 == uploadedImages.length) {
-    skipBtn.innerHTML = "finish";
-  }
+  if (currentImg + 1 == uploadedImages.length) skipBtn.innerHTML = copy.finish;
   if (noTimerLast === true && currentImg + 1 == uploadedImages.length) {
-    skipBtn.removeEventListener("click", skipImg);
+    skipBtn.removeEventListener("click", () => (skipped = true));
     skipBtn.addEventListener("click", finish);
-    let fiveBtn = document.getElementById("addFive") as HTMLButtonElement;
-    fiveBtn.disabled = true;
+    const pauseBtn = document.getElementById("pause") as HTMLButtonElement;
+    pauseBtn.disabled = true;
   } else {
     startTimer();
   }

@@ -60,13 +60,13 @@ var currentDown = null;
 window.addEventListener("mousemove", moving);
 window.addEventListener("mouseup", mouseUp);
 function moving(e) {
-    if (currentDown != null) {
-        e.preventDefault();
-        currentDown.classList.add("dragged");
-        changeX(currentDown.dataset.made, btnOpacityOff);
-        currentDown.style.left = "".concat(e.clientX - 10, "px");
-        currentDown.style.top = "".concat(e.clientY - 10, "px");
-    }
+    if (currentDown === null)
+        return;
+    e.preventDefault();
+    currentDown.classList.add("dragged");
+    changeX(currentDown.dataset.made, btnOpacityOff);
+    currentDown.style.left = "".concat(e.clientX - 10, "px");
+    currentDown.style.top = "".concat(e.clientY - 10, "px");
 }
 function arraymove(arr, fromIndex, toIndex) {
     var element = arr[fromIndex];
@@ -74,27 +74,27 @@ function arraymove(arr, fromIndex, toIndex) {
     arr.splice(toIndex, 0, element);
 }
 function mouseUp(event) {
-    if (currentDown !== null) {
-        var currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
-        currentDown.classList.remove("dragged");
-        currentDown = null;
-        var clientX = event.clientX;
-        for (var i = 0; i < uploadedImages.length; i++) {
-            if (i !== currentDownNum) {
-                var currentElm = document.querySelector("[data-made=\"".concat(i, "\"]"));
-                if (currentElm) {
-                    var elmBox = currentElm.getBoundingClientRect();
-                    if (elmBox.right > clientX) {
-                        arraymove(uploadedImages, currentDownNum, i);
-                        renderThumbs();
-                        break;
-                    }
+    if (currentDown === null)
+        return;
+    var currentDownNum = parseInt(currentDown.dataset.made || "0", 10);
+    currentDown.classList.remove("dragged");
+    currentDown = null;
+    var clientX = event.clientX;
+    for (var i = 0; i < uploadedImages.length; i++) {
+        if (i !== currentDownNum) {
+            var currentElm = document.querySelector("[data-made=\"".concat(i, "\"]"));
+            if (currentElm) {
+                var elmBox = currentElm.getBoundingClientRect();
+                if (elmBox.right > clientX) {
+                    arraymove(uploadedImages, currentDownNum, i);
+                    renderThumbs();
+                    break;
                 }
             }
-            if (i === uploadedImages.length - 1) {
-                arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
-                renderThumbs();
-            }
+        }
+        if (i === uploadedImages.length - 1) {
+            arraymove(uploadedImages, currentDownNum, uploadedImages.length - 1);
+            renderThumbs();
         }
     }
 }
@@ -217,73 +217,65 @@ function renderImages(images) {
         numEl.innerHTML = uploadedImages.length.toString();
     changeMinPerImg();
 }
+var copy = {
+    pause: "Pause Timer",
+    start: "Start Timer",
+    skip: "Skip",
+    finish: "Finish"
+};
 function startApp() {
-    if (timeCalc > 0) {
-        window.removeEventListener("mousemove", moving);
-        window.removeEventListener("mouseup", mouseUp);
-        if (!appElement)
-            return;
-        appElement.innerHTML = "";
-        var bigImg = document.createElement("img");
-        bigImg.id = "galleryImg";
-        appElement.appendChild(bigImg);
-        var timer = document.createElement("span");
-        timer.id = "timer";
-        timer.textContent = new Date(minutes * 60 * 1000)
-            .toISOString()
-            .substr(14, 5);
-        appElement.appendChild(timer);
-        var imgName = document.createElement("span");
-        imgName.id = "imgName";
-        appElement.appendChild(imgName);
-        var count = document.createElement("span");
-        count.id = "theCount";
-        count.textContent = "".concat(currentImg + 1, "/").concat(uploadedImages.length);
-        appElement.appendChild(count);
-        var skipBtn = document.createElement("button");
-        skipBtn.id = "skipBtn";
-        skipBtn.textContent = "skip";
-        skipBtn.addEventListener("click", skipImg);
-        appElement.appendChild(skipBtn);
-        var addFiveMin = document.createElement("button");
-        addFiveMin.id = "addFive";
-        addFiveMin.textContent = "pause timer";
-        addFiveMin.addEventListener("click", addFive);
-        appElement.appendChild(addFiveMin);
-        nextImg();
-    }
+    if (timeCalc <= 0)
+        return;
+    window.removeEventListener("mousemove", moving);
+    window.removeEventListener("mouseup", mouseUp);
+    if (!appElement)
+        return;
+    appElement.innerHTML = "";
+    var bigImg = document.createElement("img");
+    bigImg.id = "galleryImg";
+    appElement.appendChild(bigImg);
+    var timer = document.createElement("span");
+    timer.id = "timer";
+    timer.textContent = new Date(minutes * 60 * 1000).toISOString().substr(14, 5);
+    appElement.appendChild(timer);
+    var imgName = document.createElement("span");
+    imgName.id = "imgName";
+    appElement.appendChild(imgName);
+    var count = document.createElement("span");
+    count.id = "theCount";
+    count.textContent = "".concat(currentImg + 1, "/").concat(uploadedImages.length);
+    appElement.appendChild(count);
+    var skipBtn = document.createElement("button");
+    skipBtn.id = "skipBtn";
+    skipBtn.textContent = copy.skip;
+    skipBtn.addEventListener("click", function () { return (skipped = true); });
+    appElement.appendChild(skipBtn);
+    var timerPause = document.createElement("button");
+    timerPause.id = "pause";
+    timerPause.textContent = copy.pause;
+    timerPause.addEventListener("click", pause);
+    appElement.appendChild(timerPause);
+    nextImg();
 }
 var skipped = false;
-function skipImg() {
-    skipped = true;
-}
-function addFive() {
-    var fiveBtn = document.getElementById("addFive");
+function pause() {
+    var pauseBtn = document.getElementById("pause");
     var skipBtn = document.getElementById("skipBtn");
-    if (paused == false) {
-        paused = true;
-        fiveBtn.innerHTML = "start timer";
-        fiveBtn.disabled = true;
-        skipBtn.disabled = true;
-    }
-    else {
+    paused = !paused;
+    pauseBtn.innerHTML = !paused ? copy.pause : copy.start;
+    skipBtn.disabled = paused;
+    if (!paused)
         startTimer();
-        paused = false;
-        fiveBtn.innerHTML = "pause timer";
-        fiveBtn.disabled = true;
-        skipBtn.disabled = false;
-    }
 }
 function playAudio(audioId, volume) {
     var audioElement = document.getElementById(audioId);
-    if (audioElement) {
-        audioElement.volume = volume;
-        audioElement.play();
-    }
+    if (!audioElement)
+        return;
+    audioElement.volume = volume;
+    audioElement.play();
 }
 function startTimer() {
     var timerElement = document.getElementById("timer");
-    var fiveBtn = document.getElementById("addFive");
     if (!timerElement)
         return;
     var secondsDummy = minutes * 60;
@@ -337,10 +329,10 @@ function finish() {
     appElement.innerHTML = "";
     appElement.appendChild(endScreen);
     var endMusic = document.getElementById("endMusic");
-    if (endMusic) {
-        endMusic.volume = musicVolume;
-        endMusic.play();
-    }
+    if (!endMusic)
+        return;
+    endMusic.volume = musicVolume;
+    endMusic.play();
 }
 function nextImg() {
     currentImg++;
@@ -353,14 +345,13 @@ function nextImg() {
     gallery.src = theNowImg.blob;
     imgName.innerHTML = theNowImg.name;
     nextSFX.play();
-    if (currentImg + 1 == uploadedImages.length) {
-        skipBtn.innerHTML = "finish";
-    }
+    if (currentImg + 1 == uploadedImages.length)
+        skipBtn.innerHTML = copy.finish;
     if (noTimerLast === true && currentImg + 1 == uploadedImages.length) {
-        skipBtn.removeEventListener("click", skipImg);
+        skipBtn.removeEventListener("click", function () { return (skipped = true); });
         skipBtn.addEventListener("click", finish);
-        var fiveBtn = document.getElementById("addFive");
-        fiveBtn.disabled = true;
+        var pauseBtn = document.getElementById("pause");
+        pauseBtn.disabled = true;
     }
     else {
         startTimer();
