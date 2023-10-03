@@ -9,19 +9,17 @@
   <body>
     <div id="app">
       <div id="startScreen">
-        <input
-          type="file"
-          multiple
-          id="filetag"
-          onchange="changeImage(this)"
-          accept="image/x-png,image/gif,image/jpeg"
-        />
-
         <div id="chooseForMe">
           <button onclick="document.getElementById('chooseFile').click()">
-            Choose For Me
+            Upload Images
           </button>
-          <input min="1" value="3" max="9" type="number" id="chooseNum" />
+          <input
+            min="1"
+            max="9"
+            type="number"
+            id="chooseNum"
+            placeholder="Limit"
+          />
           <input
             type="file"
             multiple
@@ -32,10 +30,8 @@
           />
         </div>
         <div id="thumbnails"></div>
-        images in queue: <span id="queueNum">0</span>
-        <button id="clrQueue" onclick="clearQueue()" disabled>
-          clear queue
-        </button>
+        Images in Queue: <span id="queueNum">0</span>
+        <button id="clrQueue" onclick="clearQueue()" disabled>Clear</button>
         <div id="timerSettings">
           <h4>Timer Settings</h4>
           <label for="minPerImg">Minutes Per Image: </label
