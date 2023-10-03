@@ -165,14 +165,6 @@ function killThumb(number: number) {
   renderThumbs();
 }
 
-function changeImage(input: HTMLInputElement) {
-  if (!input.files) return;
-  const newImages = Array.from(input.files);
-  if (newImages.length === 0) return;
-  renderImages(newImages);
-  input.value = "";
-}
-
 function getRandomEntriesFromArray<T>(arr: T[], targetLength: number): T[] {
   if (targetLength >= arr.length) return arr;
   const result: T[] = [...arr]; // Clone the original array to avoid modifying it.
@@ -189,10 +181,6 @@ function chooseImage(input: HTMLInputElement) {
   if (!input.files) return;
   const newImages = Array.from(input.files);
   if (newImages.length === 0) return;
-  if (input.files.length < Number.parseFloat(chooseNumEl.value)) {
-    alert("Not enough files selected");
-    return;
-  }
   const randomImages = getRandomEntriesFromArray(
     newImages,
     Number.parseFloat(chooseNumEl.value)
