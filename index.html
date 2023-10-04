@@ -74,8 +74,33 @@
             />
             <label for="noTimerOnLastImage">Off On Last Image</label>
           </div>
+          <br />
+          Est Warm-Up Time: <span id="totalTime">0</span> Minutes
         </div>
-        Est Warm-Up Time: <span id="totalTime">0</span> Minutes<br />
+        <div id="soundSettings">
+          <h4>Sound Settings</h4>
+          <div>
+            <input
+              type="radio"
+              id="soundOn"
+              name="soundOption"
+              value="on"
+              onchange="changeAudio(this)"
+              checked
+            />
+            <label for="timerAlwaysOn">SFX On</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="soundOff"
+              name="soundOption"
+              value="off"
+              onchange="changeAudio(this)"
+            />
+            <label for="timerAlwaysOff">SFX Off</label>
+          </div>
+        </div>
         <button id="startButton" onclick="startApp()" disabled>
           Start Warm-Up
         </button>

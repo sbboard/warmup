@@ -49,6 +49,12 @@ function changeMinPerImg() {
   if (timer.timeCalc === 0) startButton.disabled = true;
 }
 
+function changeAudio(input: HTMLInputElement) {
+  document.querySelectorAll("audio").forEach((audio) => {
+    audio.muted = input.value === "off";
+  });
+}
+
 function clearQueue() {
   uploadedImages = [];
   if (numEl) numEl.innerHTML = uploadedImages.length.toString();
