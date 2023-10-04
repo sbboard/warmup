@@ -86,7 +86,6 @@
               name="soundOption"
               value="on"
               onchange="changeAudio(this)"
-              checked
             />
             <label for="timerAlwaysOn">SFX On</label>
           </div>
@@ -97,6 +96,7 @@
               name="soundOption"
               value="off"
               onchange="changeAudio(this)"
+              checked
             />
             <label for="timerAlwaysOff">SFX Off</label>
           </div>
@@ -106,18 +106,10 @@
         </button>
       </div>
     </div>
-    <audio
-      id="endMusic"
-      src="./sfx/AlarmReliefSupplies01.wav"
-      preload="auto"
-    ></audio>
-    <audio
-      id="nextSFX"
-      src="./sfx/AlarmReliefSupplies00.wav"
-      preload="auto"
-    ></audio>
-    <audio id="oneMin" src="./sfx/bellcmp01.wav" preload="auto"></audio>
-    <audio id="tok" src="./sfx/MiniG_Nomal_CL.wav" preload="auto"></audio>
+    <audio id="endMusic" src="./sfx/alarm1.wav" preload="auto" muted></audio>
+    <audio id="nextSFX" src="./sfx/alarm0.wav" preload="auto" muted></audio>
+    <audio id="oneMin" src="./sfx/bellcmp01.wav" preload="auto" muted></audio>
+    <audio id="tok" src="./sfx/MiniG_Nomal_CL.wav" preload="auto" muted></audio>
     <script src="app.js"></script>
   </body>
 </html>
