@@ -40,13 +40,18 @@ nextSFX.volume = musicVolume;
 ////////////
 function changeMinPerImg() {
   if (!totalTimeElement) return;
+  if (minPerImg.disabled) {
+    totalTimeElement.innerHTML = uploadedImages.length === 0 ? "0" : "&#8734";
+    startButton.disabled = uploadedImages.length === 0;
+    return;
+  }
   const inputValue = minPerImg.value.trim();
   const clampedValue = Math.min(Math.max(parseInt(inputValue, 10) || 0, 1), 25);
   minPerImg.value = clampedValue.toString();
   timer.minutes = timer.minutesDupe = clampedValue;
   timer.timeCalc = uploadedImages.length * clampedValue;
   totalTimeElement.innerHTML = timer.timeCalc.toString();
-  if (timer.timeCalc === 0) startButton.disabled = true;
+  startButton.disabled = timer.timeCalc === 0;
 }
 
 function changeAudio(input: HTMLInputElement) {
@@ -62,10 +67,21 @@ function clearQueue() {
   startButton.disabled = true;
   if (thumbnailsContainer) thumbnailsContainer.innerHTML = "";
   changeMinPerImg();
+  checkQueueFull();
 }
 
 function changePauseEnd(input: HTMLInputElement) {
+  minPerImg.disabled = input.value === "TimerAlwaysOff";
   timer.timerSetting = input.value as TimerSetting;
+  changeMinPerImg();
+}
+
+function checkQueueFull() {
+  const chooseNumEl = document.querySelector("#chooseNum") as HTMLInputElement;
+  const uploadBtn = document.querySelector("#uploadBtn") as HTMLButtonElement;
+  const imagesLength = uploadedImages.length;
+  const isFull = imagesLength >= (Number.parseFloat(chooseNumEl.value) || 20);
+  uploadBtn.disabled = isFull;
 }
 
 let currentDown: HTMLElement | null = null;
@@ -160,6 +176,7 @@ function renderThumbs() {
     startButton.disabled = false;
     if (numEl) numEl.innerHTML = uploadedImages.length.toString();
     changeMinPerImg();
+    checkQueueFull();
     return;
   }
   clearInput.disabled = true;
@@ -184,15 +201,13 @@ function getRandomEntriesFromArray<T>(arr: T[], targetLength: number): T[] {
 }
 
 function chooseImage(input: HTMLInputElement) {
-  clearQueue();
   const chooseNumEl = document.querySelector("#chooseNum") as HTMLInputElement;
   if (!input.files) return;
   const newImages = Array.from(input.files);
   if (newImages.length === 0) return;
-  const randomImages = getRandomEntriesFromArray(
-    newImages,
-    Number.parseFloat(chooseNumEl.value)
-  );
+  const getLimit = Number.parseFloat(chooseNumEl.value) || 20;
+  const uploadLimit = getLimit - uploadedImages.length;
+  const randomImages = getRandomEntriesFromArray(newImages, uploadLimit);
   renderImages(randomImages);
   input.value = "";
 }
