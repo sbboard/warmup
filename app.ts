@@ -310,19 +310,18 @@ function startTimer() {
   if (!timerElement) return;
   let secondsDummy = timer.minutes * 60;
   function downTick() {
-    if (!timer.paused) {
-      secondsDummy--;
-      timerElement.innerHTML = new Date(secondsDummy * 1000)
-        .toISOString()
-        .substr(14, 5);
-      if (secondsDummy === 60) {
-        playAudio("oneMin", musicVolume); //minute warning sfx
-      } else if (secondsDummy <= 3 && secondsDummy !== 0) {
-        playAudio("tok", musicVolume); // final 3 seconds sfx
-      } else if (secondsDummy === 0) {
-        if (currentImg + 1 !== uploadedImages.length) resetTimer();
-        else finish();
-      }
+    if (timer.paused) return;
+    secondsDummy--;
+    timerElement.innerHTML = new Date(secondsDummy * 1000)
+      .toISOString()
+      .substr(14, 5);
+    if (secondsDummy === 60) {
+      playAudio("oneMin", musicVolume); //minute warning sfx
+    } else if (secondsDummy <= 3 && secondsDummy !== 0) {
+      playAudio("tok", musicVolume); // final 3 seconds sfx
+    } else if (secondsDummy === 0) {
+      if (currentImg + 1 !== uploadedImages.length) resetTimer();
+      else finish();
     }
   }
   timerLoop = setInterval(downTick, 1000);
@@ -372,7 +371,7 @@ function nextImg() {
   if ((ts === TSI[2] && currentImg + 1 == imgLength) || ts === TSI[1]) {
     const pauseBtn = document.getElementById("pause") as HTMLButtonElement;
     pauseBtn.disabled = true;
-  } else {
-    startTimer();
+    return;
   }
+  startTimer();
 }
