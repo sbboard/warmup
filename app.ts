@@ -190,9 +190,10 @@ function killThumb(number: number) {
   renderThumbs();
 }
 
-function getRandomEntriesFromArray<T>(arr: T[], targetLength: number): T[] {
-  if (targetLength >= arr.length) return arr;
-  const result: T[] = [...arr]; // Clone the original array to avoid modifying it.
+function getRandomEntriesFromArray(arr: File[], targetLength: number): File[] {
+  const u = uploadedImages;
+  const result = [...arr].filter((b) => !u.some((a) => a.name === b.name));
+  if (targetLength >= arr.length) return result;
   while (result.length > targetLength) {
     const randomIndex = Math.floor(Math.random() * result.length);
     result.splice(randomIndex, 1); // Remove the random element from the array.
