@@ -35,7 +35,14 @@
         </div>
         <div id="thumbnails"></div>
         Images in Queue: <span id="queueNum">0</span>
-        <button id="clrQueue" onclick="clearQueue()" disabled>Clear</button>
+
+        <div>
+          <input type="checkbox" onchange="changeShuffle(this)" />
+          <label>Shuffle Images On Start</label>
+        </div>
+        <button id="clrQueue" onclick="clearQueue()" disabled>
+          Clear Queue
+        </button>
         <div id="timerSettings">
           <h4>Timer Settings</h4>
           <label for="minPerImg">Minutes Per Image: </label

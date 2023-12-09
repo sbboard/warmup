@@ -6,6 +6,7 @@ const clearInput = document.querySelector("#clrQueue") as HTMLButtonElement;
 const startButton = document.querySelector("#startButton") as HTMLButtonElement;
 const numEl = document.querySelector("#queueNum");
 const thumbnailsContainer = document.querySelector("#thumbnails");
+let shuffle = false;
 
 type UploadImg = {
   name: string;
@@ -58,6 +59,10 @@ function changeAudio(input: HTMLInputElement) {
   document.querySelectorAll("audio").forEach((audio) => {
     audio.muted = input.value === "off";
   });
+}
+
+function changeShuffle(input: HTMLInputElement) {
+  shuffle = input.checked;
 }
 
 function clearQueue() {
@@ -285,6 +290,9 @@ function startApp() {
   timerPause.textContent = copy.pause;
   timerPause.addEventListener("click", pause);
   appElement.appendChild(timerPause);
+
+  // shuffle the images
+  if (shuffle) uploadedImages.sort(() => Math.random() - 0.5);
 
   // Load the first image
   nextImg();
