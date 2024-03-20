@@ -249,6 +249,8 @@ const copy = {
 
 function startApp() {
   const { minutes, timeCalc } = timer;
+  console.log("[debug] timeCalc", timeCalc);
+  console.log("[debug] appElement", appElement);
   if (timeCalc <= 0) return;
   window.removeEventListener("mousemove", moving);
   window.removeEventListener("mouseup", mouseUp);
