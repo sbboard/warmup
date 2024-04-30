@@ -322,17 +322,30 @@ function startTimer() {
   let secondsDummy = timer.minutes * 60;
   function downTick() {
     if (timer.paused) return;
+
+    //update timer
     secondsDummy--;
-    timerElement.innerHTML = new Date(secondsDummy * 1000)
-      .toISOString()
-      .substr(14, 5);
+    const timerNum = new Date(secondsDummy * 1000).toISOString().substr(14, 5);
+    timerElement.innerHTML = timerNum;
+
+    //timer sfx
     if (secondsDummy === 60) {
       playAudio("oneMin", musicVolume); //minute warning sfx
-    } else if (secondsDummy <= 3 && secondsDummy !== 0) {
+      return;
+    }
+    if (secondsDummy <= 3 && secondsDummy > 0) {
       playAudio("tok", musicVolume); // final 3 seconds sfx
-    } else if (secondsDummy === 0) {
-      if (currentImg + 1 !== uploadedImages.length) resetTimer();
-      else finish();
+      return;
+    }
+
+    //end
+    if (secondsDummy <= 0) {
+      if (currentImg + 1 !== uploadedImages.length) {
+        resetTimer();
+        return;
+      }
+      clearInterval(timerLoop);
+      finish();
     }
   }
   timerLoop = setInterval(downTick, 1000);
