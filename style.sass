@@ -100,6 +100,43 @@ table
     justify-content: center
     align-items: center
     animation: fadeup 1s
+    flex-direction: column
+    h1
+        display: block
+        height: 1em
+        line-height: 1
+        margin-bottom: 1em
+    #imgTable
+        max-width: 100%
+        width: 817px
+        max-height: 50vh
+        overflow: auto
+        text-align: left
+        div
+            height: 200px
+            width: 200px
+            display: inline-block
+            position: relative
+            background-color: #252525
+            border: 2px solid #131313
+            img
+                max-height: 100%
+                max-width: 100%
+                margin: auto
+                position: absolute
+                inset: 0
+            span
+                position: absolute
+                background-color: rgba(0, 0, 0, 0.5)
+                text-overflow: ellipsis
+                bottom: 0
+                overflow: hidden
+                white-space: nowrap
+                width: 100%
+                line-height: 1
+                height: 2em
+                padding: .5em
+                z-index: 1
 #startScreen
     padding-left: 1em
     padding-top: 1em

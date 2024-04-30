@@ -365,9 +365,28 @@ function finish() {
   if (!appElement) return;
   const endScreen = document.createElement("div");
   endScreen.id = "endScreen";
-  endScreen.textContent = "GOOD WARM-UP!";
+
+  const h1 = document.createElement("h1");
+  h1.innerHTML = "GOOD WARM UP!";
+  endScreen.appendChild(h1);
+
+  const imgTable = document.createElement("div");
+  imgTable.id = "imgTable";
+  uploadedImages.forEach((img) => {
+    const td = document.createElement("div");
+    const imgEl = document.createElement("img");
+    const nameEl = document.createElement("span");
+    imgEl.src = img.blob;
+    nameEl.innerHTML = img.name;
+    td.appendChild(nameEl);
+    td.appendChild(imgEl);
+    imgTable.appendChild(td);
+  });
+  endScreen.appendChild(imgTable);
+
   appElement.innerHTML = "";
   appElement.appendChild(endScreen);
+
   const endMusic = document.getElementById("endMusic") as HTMLAudioElement;
   if (!endMusic) return;
   endMusic.volume = musicVolume;
